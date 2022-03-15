@@ -76,6 +76,14 @@ class Endereco(PessoaUtil, object):
         # esse 0 indica que pegarei primeiro elemento da tupla
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
+    def atualiza_endereco(self, endereco_id):
+        self.estado = self.conexao.select_id('pessoa_estado', 'estado', self.estado)[0]
+        self.tipo_endereco = self.conexao.select_id('pessoa_tipoendereco', 'tipo_endereco', self.tipo_endereco)[0]
+        comando_sql = f"UPDATE pessoa_endereco SET rua='{self.rua}', numero='{self.numero}', bairro='{self.bairro}', " \
+                      f"cep='{self.cep}', cidade='{self.cidade}', estado_id={self.estado}, tipo_endereco_id={self.tipo_endereco} " \
+                      f"WHERE id={endereco_id}"
+        self.conexao.executa_update(comando_sql=comando_sql)
+
 
 class Pessoa(PessoaUtil, object):
     def __init__(self, nome=None, sobrenome=None, data_nascimento=None,
@@ -92,7 +100,7 @@ class Pessoa(PessoaUtil, object):
         self.endereco = endereco
         self.estado_civil = estado_civil
         self.data_cadastro = datetime.now()
-        self.cadastrar_pessoa()
+        # self.cadastrar_pessoa()
 
     def restricao_pessoa(self):
         print('ola')
@@ -124,32 +132,50 @@ class Pessoa(PessoaUtil, object):
         comando_sql = 'SELECT id FROM pessoa_pessoa ORDER BY id DESC LIMIT 1'
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
-    def atualiza_pessoa(self, nome=None, sobrenome=None, data_nascimento=None,
+    def atualiza_pessoa(self, id=None, nome=None, sobrenome=None, data_nascimento=None,
                         genero=None, endereco=None, estado_civil=None):
-
+        comando_sql = f'SELECT endereco_id FROM pessoa_pessoa WHERE id={id}'
+        endereco_id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
+        print(id)
+        print(nome)
+        print(sobrenome)
+        print(data_nascimento)
+        print(genero)
+        print(endereco)
+        print(endereco.rua)
+        print(endereco.numero)
+        print(endereco.bairro)
+        print(endereco.cep)
+        print(endereco.cidade)
+        print(endereco.estado)
+        print(endereco.tipo_endereco)
+        print(endereco_id)
+        print(estado_civil)
         parcela = ''
         entrada = 0
 
         if nome:
-            parcela += f"nome={nome}, "
+            parcela += f"nome='{nome}', "
             entrada += 1
         if sobrenome:
-            parcela += f"sobrenome={sobrenome}, "
+            parcela += f"sobrenome='{sobrenome}', "
             entrada += 1
         if data_nascimento:
-            parcela += f"data_nascimento={data_nascimento}, "
+            parcela += f"data_nascimento='{data_nascimento}', "
             entrada += 1
         if genero:
-            parcela += f"genero_id={self.conexao.select_id('pessoa_genero', 'genero', self.genero)[0]}, "
+            parcela += f"genero_id={self.conexao.select_id('pessoa_genero', 'genero', genero)[0]}, "
             entrada += 1
         if endereco:
-            parcela += f"endereco_id={endereco}, "
+            endereco.atualiza_endereco(endereco_id=endereco_id)
+            parcela += f"endereco_id={endereco_id}, "
             entrada += 1
         if estado_civil:
-            parcela += f"estado_civil_id={self.conexao.select_id('pessoa_estadocivil', 'estado_civil', self.estado_civil)[0]} "
+            parcela += f"estado_civil_id={self.conexao.select_id('pessoa_estadocivil', 'estado_civil', estado_civil)[0]}"
             entrada += 1
 
-        comando_sql = f"UPDATE pessoa_pessoa SET {parcela} WHERE id=%s"
+        comando_sql = f"UPDATE pessoa_pessoa SET {parcela} WHERE id={id}"
+        self.conexao.executa_update(comando_sql=comando_sql)
 
 
 class Usuario(PessoaUtil, object):
@@ -172,9 +198,6 @@ class Usuario(PessoaUtil, object):
         self.usuario = f'{self.pessoa.nome}{self.pessoa.sobrenome}'
         self.email = f'{self.pessoa.nome}{self.pessoa.sobrenome}@educamais.com'
         self.senha = f'{self.pessoa.nome}@{self.pessoa.cpf}'
-        print(self.pessoa.id)
-        print(self.pessoa.nome)
-        print(self.pessoa.sobrenome)
 
         comando_sql = "INSERT INTO pessoa_usuario (usuario, email, senha, pessoa_id, tipo_usuario_id) VALUES (%s, %s, %s, %s, %s)"
 

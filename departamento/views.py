@@ -128,7 +128,7 @@ class CadastraAluno(UtilAluno):
                 tipo_endereco=self.view.tipo_end_input.currentText(),
             )
         )
-
+        pessoa.cadastrar_pessoa()
         aluno = Aluno(
             pessoa=pessoa,
             usuario=Usuario(
@@ -137,14 +137,6 @@ class CadastraAluno(UtilAluno):
             ),
             curso=self.view.curso_input.currentText()
         )
-        #
-        #
-        #     Usuario(
-        #         pessoa=pessoa,
-        #     ),
-        #     tipo_usuario=self.tipo_cadastro
-        # ),
-        # curso = self.view.curso_input.currentText(),
         aluno.cadastra_aluno()
 
 
@@ -155,8 +147,39 @@ class AtualizaAluno(UtilAluno):
             r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\atualizaraluno.ui')
         self.exibe_output()
 
+    def exibe_tela(self):
+        super().exibe_tela()
+        self.view.pushButton.clicked.connect(self.atualiza_aluno)
+
+    def exibe_output(self):
+        super().exibe_output()
+        self.exibe_aluno()
+
+    def exibe_aluno(self):
+        comando_sql = "SELECT * FROM departamento_aluno"
+        alunos = self.conexao.select_all(comando_sql)
+        for aluno in alunos:
+            self.view.lista_aluno.addItem(str(aluno[0]))
+
     def atualiza_aluno(self):
-        pass
+        aluno = Aluno(
+            pessoa=self.view.lista_aluno.currentText()
+        )
+        aluno.atualiza_aluno(nome=self.view.nome_input.displayText(),
+                             sobrenome=self.view.sobrenome_input.displayText(),
+                             data_nascimento=self.view.data_nasc_input.displayText(),
+                             estado_civil=self.view.estado_civil_input.currentText(),
+                             genero=self.view.genero_input.currentText(),
+                             endereco=Endereco(
+                                 rua=self.view.rua_input.displayText(),
+                                 numero=self.view.numero_input.displayText(),
+                                 bairro=self.view.bairro_input.displayText(),
+                                 cep=self.view.cep_input.displayText(),
+                                 cidade=self.view.cidade_input.displayText(),
+                                 estado=self.view.estado_input.currentText(),
+                                 tipo_endereco=self.view.tipo_end_input.currentText(),
+                             )
+                             )
 
 
 class VisualizaAluno():

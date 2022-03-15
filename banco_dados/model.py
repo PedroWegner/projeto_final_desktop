@@ -41,6 +41,12 @@ class ConexaoBD(object):
         self.conecta.commit()
         self.desconecta()
 
+    def executa_update(self, comando_sql):
+        self.conectar()
+        self.cursor.execute(comando_sql)
+        self.conecta.commit()
+        self.desconecta()
+
     def executa_fetchone(self, comando_sql):
         self.conectar()
         self.cursor.execute(comando_sql)

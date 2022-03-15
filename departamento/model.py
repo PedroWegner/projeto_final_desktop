@@ -155,6 +155,19 @@ class Aluno(DepartamentoUtil, object):
             tupla=tupla
         )
 
+    def atualiza_aluno(self, nome=None, sobrenome=None, data_nascimento=None,
+                        genero=None, endereco=None, estado_civil=None):
+        att_pessoa = Pessoa()
+        att_pessoa.atualiza_pessoa(
+            id=self.pessoa,
+            nome=nome,
+            sobrenome=sobrenome,
+            data_nascimento=data_nascimento,
+            genero=genero,
+            endereco=endereco,
+            estado_civil=estado_civil,
+        )
+
 
 class Professor(DepartamentoUtil, object):
     def __init__(self, titulo=None, usuario=None, pessoa=None):
