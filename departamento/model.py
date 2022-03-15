@@ -104,20 +104,73 @@ class Disciplina(DepartamentoUtil, object):
 
 
 class Aluno(DepartamentoUtil, object):
-    def __init__(self, usuario=None, curso=None, disciplina=None):
+    def __init__(self, usuario=None, curso=None, disciplina=None, pessoa=None):
         super().__init__()
         self.id = None
+        self.pessoa = pessoa
         self.usuario = usuario
         self.curso = curso
         self.disciplina = disciplina
+        # self.cadastra_aluno()
+
+    def exibe_aluno(self, id_aluno):
+        comando_sql = f"SELECT * FROM departamento_aluno WHERE id={id_aluno}"
+        resultado = self.conexao.executa_fetchone(comando_sql=comando_sql)
+
+        self.id = resultado[0]
+        self.usuario = resultado[1]
+
+        comando_sql = f"SELECT PeUsuario.usuario " \
+                      f"FROM trabalho_final.departamento_aluno DepAluno " \
+                      f"INNER JOIN trabalho_final.pessoa_usuario PeUsuario ON DepAluno.usuario_id = PeUsuario.Id " \
+                      f"WHERE DepAluno.id={self.id};"
+        resultado = self.conexao.executa_fetchone(comando_sql=comando_sql)
+        return resultado
 
     def cadastra_aluno(self):
-        comando_sql = "INSERT INTO departamento_aluno (usuario, curso) VALUES (%s, %s)"
+        comando_sql = "INSERT INTO departamento_aluno (pessoa_id, usuario_id) VALUES (%s, %s)"
 
         tupla = (
+            self.pessoa.id,
             self.usuario.id,
-            self.conexao.select_id('departamento_curso',
-                                   'curso', self.curso)[0],
+        )
+
+        self.conexao.executa_insert(
+            comando_sql=comando_sql,
+            tupla=tupla,
+        )
+
+        comando_sql = 'SELECT id FROM departamento_aluno ORDER BY id DESC LIMIT 1'
+        self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
+
+        comando_sql = "INSERT INTO departamento_aluno_curso (aluno_id, curso_id) VALUES (%s, %s)"
+
+        tupla = (
+            self.id,
+            self.conexao.select_id('departamento_curso', 'curso', self.curso)[0]
+        )
+
+        self.conexao.executa_insert(
+            comando_sql=comando_sql,
+            tupla=tupla
+        )
+
+
+class Professor(DepartamentoUtil, object):
+    def __init__(self, titulo=None, usuario=None, pessoa=None):
+        super().__init__()
+        self.id = None
+        self.pesso = pessoa
+        self.titulo = titulo
+        self.usuario = usuario
+
+    def cadastra_professor(self):
+        comando_sql = "INSERT INTO departamento_professor (titulo_id, usuario_id) VALUES (%s %s)"
+        tupla = (
+            self.conexao.select_id('departamento_tituloprofessor',
+                                   'titulo', self.titulo)[0],
+            self.usuario.id,
+
         )
 
         self.conexao.executa_insert(

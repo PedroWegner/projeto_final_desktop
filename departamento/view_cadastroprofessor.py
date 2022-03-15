@@ -36,6 +36,12 @@ def exibe_tipo_endereco():
     for tipo_endereco in tipos_endereco:
         view.tipo_end_input.addItem(tipo_endereco[1])
 
+def exibe_titulo():
+    comando_sql = "SELECT * FROM departamento_tituloprofessor"
+    titulos = conexao.select_all(comando_sql)
+    for titulo in titulos:
+        view.tipo_end_input.addItem(titulo[1])
+
 
 def cadastro_de_pessoa():
     usuario = Usuario(
@@ -56,7 +62,7 @@ def cadastro_de_pessoa():
                 tipo_endereco=view.tipo_end_input.currentText(),
             ),
         ),
-        tipo_perfil=tipo_cadastro
+        tipo_usuario=tipo_cadastro
     )
 
 

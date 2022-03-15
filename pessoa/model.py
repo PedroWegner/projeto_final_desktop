@@ -124,6 +124,33 @@ class Pessoa(PessoaUtil, object):
         comando_sql = 'SELECT id FROM pessoa_pessoa ORDER BY id DESC LIMIT 1'
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
+    def atualiza_pessoa(self, nome=None, sobrenome=None, data_nascimento=None,
+                        genero=None, endereco=None, estado_civil=None):
+
+        parcela = ''
+        entrada = 0
+
+        if nome:
+            parcela += f"nome={nome}, "
+            entrada += 1
+        if sobrenome:
+            parcela += f"sobrenome={sobrenome}, "
+            entrada += 1
+        if data_nascimento:
+            parcela += f"data_nascimento={data_nascimento}, "
+            entrada += 1
+        if genero:
+            parcela += f"genero_id={self.conexao.select_id('pessoa_genero', 'genero', self.genero)[0]}, "
+            entrada += 1
+        if endereco:
+            parcela += f"endereco_id={endereco}, "
+            entrada += 1
+        if estado_civil:
+            parcela += f"estado_civil_id={self.conexao.select_id('pessoa_estadocivil', 'estado_civil', self.estado_civil)[0]} "
+            entrada += 1
+
+        comando_sql = f"UPDATE pessoa_pessoa SET {parcela} WHERE id=%s"
+
 
 class Usuario(PessoaUtil, object):
     def __init__(self, pessoa=None, usuario=None, email=None, senha=None, tipo_usuario=None):
@@ -163,3 +190,6 @@ class Usuario(PessoaUtil, object):
             comando_sql=comando_sql,
             tupla=tupla
         )
+
+        comando_sql = 'SELECT id FROM pessoa_usuario ORDER BY id DESC LIMIT 1'
+        self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
