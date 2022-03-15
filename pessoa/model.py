@@ -92,38 +92,11 @@ class Pessoa(PessoaUtil, object):
         self.endereco = endereco
         self.estado_civil = estado_civil
         self.data_cadastro = datetime.now()
-
+        self.cadastrar_pessoa()
 
     def restricao_pessoa(self):
         print('ola')
         pass
-
-    # def cria_usuario(self):
-    #     print("Entrei no criar usuario")
-    #     first_name = self.nome
-    #     last_name = self.sobrenome
-    #     username = f'{self.nome}{self.sobrenome}.aluno'.lower()
-    #     email_inst = f'{self.nome}{self.sobrenome}@aluno.com'.lower()
-    #     senha = f'{self.cpf}{self.sobrenome}'.lower()
-    #     senha_cript = (hashlib.sha256(senha.encode()).hexdigest())
-    #     print(senha)
-    #     print(senha_cript)
-    #
-    #     comando_sql = "INSERT INTO auth_user (password, username, first_name, last_name, email, date_joined, is_staff, is_active, is_superuser)" \
-    #                   "VALUES (%s, %s, %s, %s, %s, %s, 1, 1, 1)"
-    #     tupla = (
-    #         senha_cript,
-    #         username,
-    #         first_name,
-    #         last_name,
-    #         email_inst,
-    #         self.data_cadastro
-    #     )
-    #
-    #     self.conexao.executa_insert(
-    #         comando_sql=comando_sql,
-    #         tupla=tupla
-    #     )
 
     def cadastrar_pessoa(self):
         self.endereco.cadastrar_endereco()
@@ -148,50 +121,42 @@ class Pessoa(PessoaUtil, object):
             tupla=tupla
         )
 
-    def retorna_ultima_pessoa(self):
-        comando_sql = 'SELECT * FROM pessoa_pessoa ORDER BY id DESC LIMIT 1'
-        result = self.conexao.executa_fetchone(comando_sql=comando_sql)
-        self.id = result[0]
-        self.nome = result[1]
-        self.sobrenome = result[2]
-        self.data_nascimento = result[3]
-        self.cpf = result[4]
-        self.data_cadastro = result[5]
-        self.estado_civil = result[6]
-        self.endereco = result[7]
-        self.genero = result[8]
+        comando_sql = 'SELECT id FROM pessoa_pessoa ORDER BY id DESC LIMIT 1'
+        self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
 
 class Usuario(PessoaUtil, object):
-    def __init__(self, pessoa=None, usuario=None, email=None, senha=None, tipo_perfil=None):
+    def __init__(self, pessoa=None, usuario=None, email=None, senha=None, tipo_usuario=None):
         super().__init__()
         self.id = None
         self.pessoa = pessoa
         self.usuario = usuario
         self.email = email
         self.senha = senha
-        self.tipo_perfil = tipo_perfil
+        self.tipo_usuario = tipo_usuario
+        self.cadastrar_usuario()
 
     def criptografa_senha(self):
         senha_criptografada = bcrypt.hashpw(
             str(self.senha).encode('utf-8'), bcrypt.gensalt())
         return senha_criptografada
 
-    def cria_usuario(self):
-        self.pessoa = Pessoa()
-        self.pessoa.retorna_ultima_pessoa()
+    def cadastrar_usuario(self):
         self.usuario = f'{self.pessoa.nome}{self.pessoa.sobrenome}'
         self.email = f'{self.pessoa.nome}{self.pessoa.sobrenome}@educamais.com'
         self.senha = f'{self.pessoa.nome}@{self.pessoa.cpf}'
+        print(self.pessoa.id)
+        print(self.pessoa.nome)
+        print(self.pessoa.sobrenome)
 
-        comando_sql = "INSERT INTO pessoa_usuario (usuario, email, senha, pessoa_id, tipo_perfil_id) VALUES (%s, %s, %s, %s, %s)"
+        comando_sql = "INSERT INTO pessoa_usuario (usuario, email, senha, pessoa_id, tipo_usuario_id) VALUES (%s, %s, %s, %s, %s)"
 
         tupla = (
             self.usuario,
             self.email,
             self.criptografa_senha(),
             self.pessoa.id,
-            1
+            self.tipo_usuario,
         )
 
         self.conexao.executa_insert(

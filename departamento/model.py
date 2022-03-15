@@ -2,9 +2,10 @@
 DOCUMENTAR
 """
 from banco_dados.model import ConexaoBD
+from pessoa.model import Pessoa
 
 
-class CursoUtil(object):
+class DepartamentoUtil(object):
     def __init__(self):
         self.conexao = ConexaoBD()
 
@@ -23,7 +24,7 @@ class CursoUtil(object):
             print(departamento)
 
 
-class Departamento(CursoUtil, object):
+class Departamento(DepartamentoUtil, object):
     def __init__(self, departamento=None, sigla_dep=None):
         super().__init__()
         self.id = None
@@ -42,7 +43,7 @@ class Departamento(CursoUtil, object):
         conexao.executa_insert(comando_sql, tupla)
 
 
-class Curso(CursoUtil, object):
+class Dep(DepartamentoUtil, object):
     def __init__(self, curso=None, cod_curso=None, turno=None, departamento=None):
         super().__init__()
         self.id = None
@@ -73,16 +74,16 @@ class Curso(CursoUtil, object):
 
         if len(deps) > 1:
             for departamento in deps:
-                comando_sql = 'INSERT INTO curso_curso_departamento (curso_id, departamento_id) VALUES (%s, %s)'
+                comando_sql = 'INSERT INTO departamento (curso_id, departamento_id) VALUES (%s, %s)'
                 tupla = (self.id, departamento)
                 self.conexao.executa_insert(comando_sql, tupla)
         else:
-            comando_sql = 'INSERT INTO curso_curso_departamento (curso_id, departamento_id) VALUES (%s, %s)'
+            comando_sql = 'INSERT INTO departamento (curso_id, departamento_id) VALUES (%s, %s)'
             tupla = (self.id, self.departamento)
             self.conexao.executa_insert(comando_sql, tupla)
 
 
-class Disciplina(CursoUtil, object):
+class Disciplina(DepartamentoUtil, object):
     def __init__(self, disciplina=None, departamento=None, pre_requisito=False):
         super().__init__()
         self.id = None
@@ -97,6 +98,29 @@ class Disciplina(CursoUtil, object):
         self.disciplina = 'Calculo Diferencial e Integral'
         self.pre_requisito = True
 
-        comando_sql = "INSERT INTO curso_disciplina (disciplina, departamento_id, pre_requisito) VALUES (%s, %s, %s)"
+        comando_sql = "INSERT INTO departamento_disciplina (disciplina, departamento_id, pre_requisito) VALUES (%s, %s, %s)"
         tupla = (self.disciplina, self.departamento, self.pre_requisito)
         self.conexao.executa_insert(comando_sql=comando_sql, tupla=tupla)
+
+
+class Aluno(DepartamentoUtil, object):
+    def __init__(self, usuario=None, curso=None, disciplina=None):
+        super().__init__()
+        self.id = None
+        self.usuario = usuario
+        self.curso = curso
+        self.disciplina = disciplina
+
+    def cadastra_aluno(self):
+        comando_sql = "INSERT INTO departamento_aluno (usuario, curso) VALUES (%s, %s)"
+
+        tupla = (
+            self.usuario.id,
+            self.conexao.select_id('departamento_curso',
+                                   'curso', self.curso)[0],
+        )
+
+        self.conexao.executa_insert(
+            comando_sql=comando_sql,
+            tupla=tupla,
+        )
