@@ -91,7 +91,8 @@ class Disciplina(DepartamentoUtil, object):
         self.disciplina = 'Calculo Diferencial e Integral'
         self.pre_requisito = True
 
-        comando_sql = "INSERT INTO departamento_disciplina (disciplina, departamento_id, pre_requisito) VALUES (%s, %s, %s)"
+        comando_sql = "INSERT INTO departamento_disciplina (disciplina, departamento_id, pre_requisito) VALUES" \
+                      " (%s, %s, %s)"
         tupla = (self.disciplina, self.departamento, self.pre_requisito)
         self.conexao.executa_insert(comando_sql=comando_sql, tupla=tupla)
 
@@ -135,17 +136,16 @@ class Aluno(DepartamentoUtil, object):
         comando_sql = 'SELECT id FROM departamento_aluno ORDER BY id DESC LIMIT 1'
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
-        comando_sql = "INSERT INTO departamento_aluno_curso (aluno_id, curso_id) VALUES (%s, %s)"
-
-        tupla = (
-            self.id,
-            self.conexao.select_id('departamento_curso', 'curso', self.curso)[0]
-        )
-
-        self.conexao.executa_insert(
-            comando_sql=comando_sql,
-            tupla=tupla
-        )
+        for i in range(len(self.curso)):
+            comando_sql = "INSERT INTO departamento_aluno_curso (aluno_id, curso_id) VALUES (%s, %s)"
+            tupla = (
+                self.id,
+                self.conexao.select_id('departamento_curso', 'curso', f'{self.curso[i]}')[0],
+            )
+            self.conexao.executa_insert(
+                comando_sql=comando_sql,
+                tupla=tupla
+            )
 
     def atualiza_aluno(self, nome=None, sobrenome=None, data_nascimento=None,
                        genero=None, endereco=None, estado_civil=None):
@@ -162,16 +162,18 @@ class Aluno(DepartamentoUtil, object):
 
 
 class Professor(DepartamentoUtil, object):
-    def __init__(self, titulo=None, usuario=None, pessoa=None):
+    def __init__(self, titulo=None, usuario=None, pessoa=None, departamento=None):
         super().__init__()
         self.id = None
-        self.pesso = pessoa
+        self.pessoa = pessoa
         self.titulo = titulo
         self.usuario = usuario
+        self.departamento = departamento
 
-    def cadastra_professor(self):
-        comando_sql = "INSERT INTO departamento_professor (titulo_id, usuario_id) VALUES (%s %s)"
+    def cadastrar_professor(self):
+        comando_sql = "INSERT INTO departamento_professor (pessoa_id, titulo_id, usuario_id) VALUES (%s, %s, %s)"
         tupla = (
+            self.pessoa.id,
             self.conexao.select_id('departamento_tituloprofessor',
                                    'titulo', self.titulo)[0],
             self.usuario.id,
@@ -182,3 +184,17 @@ class Professor(DepartamentoUtil, object):
             comando_sql=comando_sql,
             tupla=tupla,
         )
+
+        comando_sql = 'SELECT id FROM departamento_professor ORDER BY id DESC LIMIT 1'
+        self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
+        
+        for i in range(len(self.departamento)):
+            comando_sql = "INSERT INTO departamento_professor_departamento (professor_id, departamento_id) VALUES (%s, %s)"
+            tupla = (
+                self.id,
+                self.conexao.select_id('departamento_departamento', 'departamento', f'{self.departamento[i]}')[0],
+            )
+            self.conexao.executa_insert(
+                comando_sql=comando_sql,
+                tupla=tupla
+            )
