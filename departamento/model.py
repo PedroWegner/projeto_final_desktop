@@ -25,25 +25,24 @@ class DepartamentoUtil(object):
 
 
 class Departamento(DepartamentoUtil, object):
-    def __init__(self, departamento=None, sigla_dep=None):
+    def __init__(self, departamento=None, cod_departamento=None):
         super().__init__()
         self.id = None
         self.departamento = departamento
-        self.sigla_dep = sigla_dep
+        self.cod_departamento = cod_departamento
 
     def cadastra_departamento(self):
-        conexao = ConexaoBD()
+        comando_sql = "INSERT INTO departamento_departamento (departamento, cod_departamento) VALUES (%s, %s)"
 
-        self.departamento = 'Matemática'
-        self.sigla_dep = 'ML'
+        tupla = (
+            self.departamento,
+            self.cod_departamento,
+        )
 
-        comando_sql = "INSERT INTO curso_departamento (departamento, sigla_dep) VALUES (%s, %s)"
-        tupla = (self.departamento, self.sigla_dep)
-
-        conexao.executa_insert(comando_sql, tupla)
+        self.conexao.executa_insert(comando_sql, tupla)
 
 
-class Dep(DepartamentoUtil, object):
+class Curso(DepartamentoUtil, object):
     def __init__(self, curso=None, cod_curso=None, turno=None, departamento=None):
         super().__init__()
         self.id = None
@@ -53,34 +52,28 @@ class Dep(DepartamentoUtil, object):
         self.departamento = departamento  # o django criou uma tabela de muitos para muitos
 
     def cadastra_curso(self):
-        self.exibe_departamento()
-        self.exibe_turno()
+        comando_sql = "INSERT INTO departamento_curso (curso, cod_curso, turno_id) VALUES (%s, %s, %s)"
+        tupla = (
+            self.curso,
+            self.cod_curso,
+            self.conexao.select_id('departamento_turno', 'turno', self.turno)[0]
+        )
 
-        self.turno = int(input("Selecione o id do turno: "))
-        self.departamento = input("Selecione o id do departamento( para mais de um departamento, digitar '1, 2, 3'): ")
-        deps = self.departamento
-        if len(self.departamento) > 1:
-            deps = self.departamento.split(',')
+        self.conexao.executa_insert(comando_sql=comando_sql, tupla=tupla)
 
-        self.curso = 'Matemática'
-        self.cod_curso = 'MTA'
-
-        comando_sql = "INSERT INTO curso_curso (curso, cod_curso, turno_id) VALUES (%s, %s, %s);"
-        tupla = (self.curso, self.cod_curso, self.turno)
-        self.conexao.executa_insert(comando_sql, tupla)
-
-        comando_sql = 'SELECT id FROM curso_curso ORDER BY id DESC LIMIT 1'
+        comando_sql = "SELECT id FROM departamento_curso ORDER BY id DESC LIMIT 1"
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
 
-        if len(deps) > 1:
-            for departamento in deps:
-                comando_sql = 'INSERT INTO departamento (curso_id, departamento_id) VALUES (%s, %s)'
-                tupla = (self.id, departamento)
-                self.conexao.executa_insert(comando_sql, tupla)
-        else:
-            comando_sql = 'INSERT INTO departamento (curso_id, departamento_id) VALUES (%s, %s)'
-            tupla = (self.id, self.departamento)
-            self.conexao.executa_insert(comando_sql, tupla)
+        for i in range(len(self.departamento)):
+            comando_sql = "INSERT INTO departamento_curso_departamento (curso_id, departamento_id) VALUES (%s, %s)"
+            tupla = (
+                self.id,
+                self.conexao.select_id('departamento_departamento', 'departamento', f'{self.departamento[i]}')[0],
+            )
+            self.conexao.executa_insert(
+                comando_sql=comando_sql,
+                tupla=tupla
+            )
 
 
 class Disciplina(DepartamentoUtil, object):
@@ -111,7 +104,6 @@ class Aluno(DepartamentoUtil, object):
         self.usuario = usuario
         self.curso = curso
         self.disciplina = disciplina
-        # self.cadastra_aluno()
 
     def exibe_aluno(self, id_aluno):
         comando_sql = f"SELECT * FROM departamento_aluno WHERE id={id_aluno}"
@@ -156,7 +148,7 @@ class Aluno(DepartamentoUtil, object):
         )
 
     def atualiza_aluno(self, nome=None, sobrenome=None, data_nascimento=None,
-                        genero=None, endereco=None, estado_civil=None):
+                       genero=None, endereco=None, estado_civil=None):
         att_pessoa = Pessoa()
         att_pessoa.atualiza_pessoa(
             id=self.pessoa,

@@ -1,20 +1,29 @@
 from PyQt5 import uic, QtWidgets
 from banco_dados.model import ConexaoBD
 from pessoa.model import Pessoa, Endereco, Usuario
-from departamento.model import Aluno
+from departamento.model import Aluno, Departamento, Curso
 
 
-class UtilAluno():
+class UtilDepartamento():
     def __init__(self):
         self.conexao = ConexaoBD()
         self.app = QtWidgets.QApplication([])
         self.view = None
 
+    def exibe_output(self):
+        pass
+
     def exibe_tela(self):
         self.view.show()
         self.app.exec()
 
+
+class UtilAluno(UtilDepartamento):
+    def __init__(self):
+        super().__init__()
+
     def exibe_output(self):
+        super().exibe_output()
         self.exibe_estado()
         self.exibe_estado_civil()
         self.exibe_genero()
@@ -45,23 +54,80 @@ class UtilAluno():
             self.view.tipo_end_input.addItem(tipo_endereco[1])
 
 
+class CadastraDepartamento(UtilDepartamento):
+    def __init__(self):
+        super().__init__()
+        self.view = uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastrodepartamento.ui'
+        )
+
+    def exibe_tela(self):
+        super().exibe_tela()
+        self.view.btn_cadastra.clicked.connect(self.cadastro_dep)
+
+    def cadastro_dep(self):
+        departamento = Departamento(
+            departamento=self.view.departamento_input.displayText(),
+            cod_departamento=self.view.codigo_input.displayText(),
+        )
+        departamento.cadastra_departamento()
+
+
+class CadastraCurso(UtilDepartamento):
+    def __init__(self):
+        super().__init__()
+        self.view = uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastrocurso.ui'
+        )
+
+    def exibe_tela(self):
+        self.exibe_output()
+        super().exibe_tela()
+
+    def exibe_output(self):
+        self.view.btn_cadastra.clicked.connect(self.cadastra_curso)
+        super().exibe_output()
+        self.exibe_turno()
+        self.exibe_departamento()
+
+    def exibe_departamento(self):
+        self.view.dep_input.clear()
+        comando_sql = "SELECT * FROM departamento_departamento"
+        departamentos = self.conexao.select_all(comando_sql=comando_sql)
+        for departamento in departamentos:
+            self.view.dep_input.addItem(departamento[1])
+
+    def exibe_turno(self):
+        comando_sql = "SELECT * FROM departamento_turno"
+        turnos = self.conexao.select_all(comando_sql=comando_sql)
+        for turno in turnos:
+            self.view.turno_input.addItem(turno[1])
+
+    def cadastra_curso(self):
+        departamentos = self.view.dep_input.selectedItems()
+        dep = []
+        for departamento in departamentos:
+            dep.append(departamento.text())
+        dep = tuple(dep)
+        curso = Curso(
+            curso=self.view.curso_input.displayText(),
+            cod_curso=self.view.cod_input.displayText(),
+            turno=self.view.turno_input.currentText(),
+            departamento=dep,
+        )
+        curso.cadastra_curso()
+
+
 class CadastraAluno(UtilAluno):
     def __init__(self):
         super().__init__()
-        # self.conexao = ConexaoBD()
-        # self.app = QtWidgets.QApplication([])
         self.view = uic.loadUi(
             r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastroaluno.ui')
         self.tipo_cadastro = None
-        self.exibe_output()
-        # self.exibe_estado()
-        # self.exibe_estado_civil()
-        # self.exibe_genero()
-        # self.exibe_tipo_endereco()
-        # self.exibe_curso()
-        self.tipo_tela()
 
     def exibe_output(self):
+        self.exibe_output()
+        self.tipo_tela()
         super().exibe_output()
         self.exibe_curso()
 
@@ -76,39 +142,9 @@ class CadastraAluno(UtilAluno):
 
     def exibe_curso(self):
         comando_sql = "SELECT * FROM departamento_curso"
-        cursos = self.conexao.select_all(comando_sql)
+        cursos = self.conexao.select_all(comando_sql=comando_sql)
         for curso in cursos:
             self.view.curso_input.addItem(curso[1])
-
-    # def exibe_genero(self):
-    #     comando_sql = "SELECT * FROM pessoa_genero"
-    #     generos = self.conexao.select_all(comando_sql)
-    #     for genero in generos:
-    #         self.view.genero_input.addItem(genero[1])
-    #
-    # def exibe_estado_civil(self):
-    #     comando_sql = "SELECT * FROM pessoa_estadocivil"
-    #     estados_civil = self.conexao.select_all(comando_sql)
-    #     for estado_civil in estados_civil:
-    #         self.view.estado_civil_input.addItem(estado_civil[1])
-    #
-    # def exibe_estado(self):
-    #     comando_sql = "SELECT * FROM pessoa_estado"
-    #     estados = self.conexao.select_all(comando_sql)
-    #     for estado in estados:
-    #         self.view.estado_input.addItem(estado[1])
-    #
-    # def exibe_tipo_endereco(self):
-    #     comando_sql = "SELECT * FROM pessoa_tipoendereco"
-    #     tipos_endereco = self.conexao.select_all(comando_sql)
-    #     for tipo_endereco in tipos_endereco:
-    #         self.view.tipo_end_input.addItem(tipo_endereco[1])
-    #
-    # def exibe_curso(self):
-    #     comando_sql = "SELECT * FROM departamento_curso"
-    #     cursos = self.conexao.select_all(comando_sql)
-    #     for curso in cursos:
-    #         self.view.curso_input.addItem(curso[1])
 
     def cadastro_de_pessoa(self):
         pessoa = Pessoa(
@@ -165,21 +201,22 @@ class AtualizaAluno(UtilAluno):
         aluno = Aluno(
             pessoa=self.view.lista_aluno.currentText()
         )
-        aluno.atualiza_aluno(nome=self.view.nome_input.displayText(),
-                             sobrenome=self.view.sobrenome_input.displayText(),
-                             data_nascimento=self.view.data_nasc_input.displayText(),
-                             estado_civil=self.view.estado_civil_input.currentText(),
-                             genero=self.view.genero_input.currentText(),
-                             endereco=Endereco(
-                                 rua=self.view.rua_input.displayText(),
-                                 numero=self.view.numero_input.displayText(),
-                                 bairro=self.view.bairro_input.displayText(),
-                                 cep=self.view.cep_input.displayText(),
-                                 cidade=self.view.cidade_input.displayText(),
-                                 estado=self.view.estado_input.currentText(),
-                                 tipo_endereco=self.view.tipo_end_input.currentText(),
-                             )
-                             )
+        aluno.atualiza_aluno(
+            nome=self.view.nome_input.displayText(),
+            sobrenome=self.view.sobrenome_input.displayText(),
+            data_nascimento=self.view.data_nasc_input.displayText(),
+            estado_civil=self.view.estado_civil_input.currentText(),
+            genero=self.view.genero_input.currentText(),
+            endereco=Endereco(
+                rua=self.view.rua_input.displayText(),
+                numero=self.view.numero_input.displayText(),
+                bairro=self.view.bairro_input.displayText(),
+                cep=self.view.cep_input.displayText(),
+                cidade=self.view.cidade_input.displayText(),
+                estado=self.view.estado_input.currentText(),
+                tipo_endereco=self.view.tipo_end_input.currentText(),
+            )
+        )
 
 
 class VisualizaAluno():
@@ -191,16 +228,11 @@ class VisualizaAluno():
 
     def exibe_tela(self):
         self.exibe_aluno()
-
         self.view.show()
         self.app.exec()
 
     def exibe_aluno(self):
-        # qtd_lista = self.view.listWidget.count()
-        # print(qtd_lista)
-        # for i in range(int(qtd_lista)):
-        #     self.view.listWidget.row(i)
-
+        self.view.listWidget.clear()
         comando_sql = "SELECT * FROM departamento_aluno"
         qtd_aluno = self.conexao.select_all(comando_sql=comando_sql)
         aluno = Aluno()
