@@ -187,7 +187,7 @@ class Professor(DepartamentoUtil, object):
 
         comando_sql = 'SELECT id FROM departamento_professor ORDER BY id DESC LIMIT 1'
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
-        
+
         for i in range(len(self.departamento)):
             comando_sql = "INSERT INTO departamento_professor_departamento (professor_id, departamento_id) VALUES (%s, %s)"
             tupla = (

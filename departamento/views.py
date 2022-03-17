@@ -54,7 +54,6 @@ class InformacoaPessoa(UtilDepartamento):
             self.view.tipo_end_input.addItem(tipo_endereco[1])
 
 
-
 class CadastraDepartamento(UtilDepartamento):
     def __init__(self):
         super().__init__()
@@ -322,3 +321,26 @@ class CadastraProfessor(InformacoaPessoa):
             departamento=departamento
         )
         professor.cadastrar_professor()
+
+
+class MenuAluno(UtilDepartamento):
+    def __init__(self):
+        super().__init__()
+        self.view = uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menualuno.ui'
+        )
+        self.tipo_usuario = None
+        self.tipo_tela()
+
+    def tipo_tela(self):
+        self.tipo_usuario = self.conexao.executa_fetchone(
+            comando_sql='SELECT id FROM pessoa_tipousuario WHERE tipo_usuario="Aluno"'
+        )[0]
+
+
+class MenuProfessor(UtilDepartamento):
+    def __init__(self):
+        super().__init__()
+        self.view = uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menuprofessor.ui'
+        )
