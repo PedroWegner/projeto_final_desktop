@@ -57,3 +57,10 @@ class ConexaoBD(object):
     def select_id(self, tabela, campo, valor):
         comando_sql = f"SELECT id FROM {tabela} WHERE {campo}='{valor}' ORDER BY id DESC LIMIT 1"
         return self.executa_fetchone(comando_sql)
+
+    # def update_unitario(self, tabela, campo, valor, id_obj):
+    #     self.conecta()
+    #     comando_sql = f"UPDATE {tabela} SET {campo}={valor} WHERE id={id_obj}"
+    #     self.cursor.execute(comando_sql)
+    #     self.conecta.commit
+    #     self.desconecta()

@@ -77,24 +77,38 @@ class Curso(DepartamentoUtil, object):
 
 
 class Disciplina(DepartamentoUtil, object):
-    def __init__(self, disciplina=None, departamento=None, pre_requisito=False):
+    def __init__(self, disciplina=None, departamento=None, cod_disciplina=None, professor=None, pre_requisito=False):
         super().__init__()
         self.id = None
         self.disciplina = disciplina
         self.departamento = departamento
-        self.pre_requisito = pre_requisito
+        self.cod_disciplina = cod_disciplina
+        self.professor = professor
+        # self.pre_requisito = pre_requisito
 
     def cadastrar_disciplina(self):
-        self.exibe_departamento()
-        self.departamento = input("Selecione o id do departamento: ")
+        comando_sql = f"SELECT DePr.id " \
+                      f"FROM departamento_professor DePr " \
+                      f"INNER JOIN pessoa_pessoa PePe " \
+                      f"ON PePe.id = DePr.pessoa_id " \
+                      f"WHERE PePe.nome='{self.professor.split(' ')[0]}' " \
+                      f"AND PePe.sobrenome='{self.professor.split(' ')[1]}'"
+        self.professor = self.conexao.executa_fetchone(comando_sql)[0]
+        comando_sql = f"INSERT INTO departamento_disciplina (disciplina, cod_disciplina, departamento_id, professor_id) " \
+                      f"VALUES (%s, %s, %s, %s)"
+        tupla = (
+            self.disciplina,
+            self.cod_disciplina,
+            self.conexao.select_id('departamento_departamento', 'departamento', self.departamento)[0],
+            self.professor,
 
-        self.disciplina = 'Calculo Diferencial e Integral'
-        self.pre_requisito = True
+        )
+        print(tupla)
 
-        comando_sql = "INSERT INTO departamento_disciplina (disciplina, departamento_id, pre_requisito) VALUES" \
-                      " (%s, %s, %s)"
-        tupla = (self.disciplina, self.departamento, self.pre_requisito)
-        self.conexao.executa_insert(comando_sql=comando_sql, tupla=tupla)
+        self.conexao.executa_insert(
+            comando_sql=comando_sql,
+            tupla=tupla,
+        )
 
 
 class Aluno(DepartamentoUtil, object):

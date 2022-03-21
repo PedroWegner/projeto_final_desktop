@@ -79,9 +79,27 @@ class Endereco(PessoaUtil, object):
     def atualiza_endereco(self, endereco_id):
         self.estado = self.conexao.select_id('pessoa_estado', 'estado', self.estado)[0]
         self.tipo_endereco = self.conexao.select_id('pessoa_tipoendereco', 'tipo_endereco', self.tipo_endereco)[0]
-        comando_sql = f"UPDATE pessoa_endereco SET rua='{self.rua}', numero='{self.numero}', bairro='{self.bairro}', " \
-                      f"cep='{self.cep}', cidade='{self.cidade}', estado_id={self.estado}, tipo_endereco_id={self.tipo_endereco} " \
-                      f"WHERE id={endereco_id}"
+
+        parcela = ''
+
+        if self.rua:
+            parcela += f"rua='{self.rua}', "
+        if self.numero:
+            parcela += f"numero='{self.numero}', '"
+        if self.bairro:
+            parcela += f"bairro='{self.bairro}', "
+        if self.cep:
+            parcela += f"cep='{self.cep}', "
+        if self.cidade:
+            parcela += f"cidade='{self.cidade}', "
+
+        parcela += f"estado_id={self.estado}, tipo_endereco_id={self.tipo_endereco}"
+
+        comando_sql = f"UPDATE pessoa_endereco SET {parcela} WHERE id={endereco_id}"
+        # comando_sql = f"UPDATE pessoa_endereco SET rua='{self.rua}', numero='{self.numero}', bairro='{self.bairro}', " \
+        #               f"cep='{self.cep}', cidade='{self.cidade}', estado_id={self.estado}, tipo_endereco_id={self.tipo_endereco} " \
+        #               f"WHERE id={endereco_id}"
+        print(comando_sql)
         self.conexao.executa_update(comando_sql=comando_sql)
 
 
@@ -134,47 +152,32 @@ class Pessoa(PessoaUtil, object):
 
     def atualiza_pessoa(self, id=None, nome=None, sobrenome=None, data_nascimento=None,
                         genero=None, endereco=None, estado_civil=None):
+        print(id)
+        print(self.id)
+        if self.id and not id:
+            id = self.id
+
         comando_sql = f'SELECT endereco_id FROM pessoa_pessoa WHERE id={id}'
         endereco_id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
-        print(id)
-        print(nome)
-        print(sobrenome)
-        print(data_nascimento)
-        print(genero)
-        print(endereco)
-        print(endereco.rua)
-        print(endereco.numero)
-        print(endereco.bairro)
-        print(endereco.cep)
-        print(endereco.cidade)
-        print(endereco.estado)
-        print(endereco.tipo_endereco)
-        print(endereco_id)
-        print(estado_civil)
+
         parcela = ''
-        entrada = 0
 
         if nome:
             parcela += f"nome='{nome}', "
-            entrada += 1
         if sobrenome:
             parcela += f"sobrenome='{sobrenome}', "
-            entrada += 1
         if data_nascimento:
             parcela += f"data_nascimento='{data_nascimento}', "
-            entrada += 1
         if genero:
             parcela += f"genero_id={self.conexao.select_id('pessoa_genero', 'genero', genero)[0]}, "
-            entrada += 1
         if endereco:
             endereco.atualiza_endereco(endereco_id=endereco_id)
             parcela += f"endereco_id={endereco_id}, "
-            entrada += 1
         if estado_civil:
             parcela += f"estado_civil_id={self.conexao.select_id('pessoa_estadocivil', 'estado_civil', estado_civil)[0]}"
-            entrada += 1
 
         comando_sql = f"UPDATE pessoa_pessoa SET {parcela} WHERE id={id}"
+        print(comando_sql)
         self.conexao.executa_update(comando_sql=comando_sql)
 
 

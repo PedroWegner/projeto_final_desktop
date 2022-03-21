@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>725</width>
-    <height>536</height>
+    <width>903</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="label_bemvindo">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>110</y>
+     <x>80</x>
+     <y>10</y>
      <width>451</width>
-     <height>181</height>
+     <height>111</height>
     </rect>
    </property>
    <property name="font">
@@ -28,7 +28,43 @@
     </font>
    </property>
    <property name="text">
-    <string>MENU ALUNO</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="atualiza_btn">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>100</y>
+     <width>271</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Atualizar dados cadastrais</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btn_matricular">
+   <property name="geometry">
+    <rect>
+     <x>390</x>
+     <y>100</y>
+     <width>271</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Matricular disciplina</string>
    </property>
   </widget>
  </widget>
