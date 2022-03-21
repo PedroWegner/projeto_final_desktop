@@ -164,7 +164,6 @@ class MenuAluno(UtilDepartamento):
                 'id_aluno': self.conexao.executa_fetchone(comando_sql=comando_sql)[0],
             }
         )
-        print(self.usuario_logado)
 
 
 class MenuAlunoAtualiza(InformacoaPessoa):
@@ -183,7 +182,6 @@ class MenuAlunoAtualiza(InformacoaPessoa):
     def atualiza_aluno(self):
         pessoa = Pessoa()
         pessoa.id = self.usuario_logado['id_pessoa']
-        print(pessoa.id)
         pessoa.atualiza_pessoa(
             nome=self.view.nome_input.displayText(),
             sobrenome=self.view.sobrenome_input.displayText(),
@@ -212,6 +210,7 @@ class MatriculaDisciplina(UtilDepartamento):
 
     def exibe_tela(self):
         super().exibe_tela()
+        self.view.matricular_disc_btn.clicked.connect(self.matricular_disciplina)
         self.exibe_output()
 
     def exibe_output(self):
@@ -227,7 +226,18 @@ class MatriculaDisciplina(UtilDepartamento):
                       f"FROM departamento_aluno_disciplina DeAlDi " \
                       f"WHERE DeDi.id = DeAlDi.disciplina_id AND DeAlDi.aluno_id={self.usuario_logado['id_aluno']}" \
                       f")"
-        print(comando_sql)
         disciplinas = self.conexao.select_all(comando_sql=comando_sql)
         for disciplina in disciplinas:
             self.view.disciplina_input.addItem(disciplina[0])
+
+    def matricular_disciplina(self):
+        disc_selecionadas = self.view.disciplina_input.selectedItems()
+        disciplinas = []
+        for disciplina in disc_selecionadas:
+            disciplinas.append(disciplina.text())
+        disciplinas = tuple(disciplinas)
+
+        aluno = Aluno(disciplina=disciplinas)
+        aluno.id = self.usuario_logado['id_aluno']
+        aluno.matricula_disciplina()
+

@@ -35,8 +35,8 @@
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>280</y>
-     <width>181</width>
+     <y>180</y>
+     <width>321</width>
      <height>25</height>
     </rect>
    </property>
@@ -62,36 +62,23 @@
     <string>Cadastrar disciplina</string>
    </property>
   </widget>
-  <widget class="QListWidget" name="departamento_input">
-   <property name="geometry">
-    <rect>
-     <x>430</x>
-     <y>70</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-   <property name="selectionBehavior">
-    <enum>QAbstractItemView::SelectItems</enum>
-   </property>
-  </widget>
   <widget class="QListWidget" name="professor_input">
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>320</y>
+     <y>220</y>
      <width>256</width>
      <height>192</height>
     </rect>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
      <y>100</y>
      <width>244</width>
-     <height>62</height>
+     <height>73</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -146,6 +133,16 @@
      </layout>
     </item>
    </layout>
+  </widget>
+  <widget class="QComboBox" name="departamento_input">
+   <property name="geometry">
+    <rect>
+     <x>430</x>
+     <y>80</y>
+     <width>351</width>
+     <height>22</height>
+    </rect>
+   </property>
   </widget>
  </widget>
  <resources/>

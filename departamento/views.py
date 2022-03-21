@@ -126,13 +126,13 @@ class CadastraDisciplina(UtilDepartamento):
 
     def exibe_tela(self):
         super().exibe_tela()
+        self.view.departamento_input.currentIndexChanged.connect(self.exibe_professor)
         self.view.cadastra_disci.clicked.connect(self.cadastra_disciplina)
         self.exibe_output()
 
     def exibe_output(self):
         super().exibe_output()
         self.exibe_departamento()
-        self.exibe_professor()
 
     def exibe_departamento(self):
         self.view.departamento_input.clear()
@@ -143,20 +143,23 @@ class CadastraDisciplina(UtilDepartamento):
 
     def exibe_professor(self):
         self.view.professor_input.clear()
-        comando_sql = "SELECT DePr.id, PePe.nome, PePe.sobrenome, DeTi.sigla " \
-                      "FROM trabalho_final.departamento_professor DePr " \
-                      "INNER JOIN trabalho_final.pessoa_pessoa PePe " \
-                      "ON PePe.id = DePr.pessoa_id " \
-                      "INNER JOIN trabalho_final.departamento_tituloprofessor DeTi " \
-                      "ON DeTi.id = DePr.titulo_id;"
+        comando_sql = f"SELECT PePe.nome, PePe.sobrenome " \
+                      f"FROM departamento_departamento DeDe " \
+                      f"INNER JOIN departamento_professor_departamento DePrDe " \
+                      f"ON DeDe.id = DePrDe.departamento_id " \
+                      f"INNER JOIN departamento_professor DePr " \
+                      f"ON DePr.id = DePrDe.professor_id " \
+                      f"INNER JOIN pessoa_pessoa PePe " \
+                      f"ON DePr.pessoa_id = PePe.id " \
+                      f"WHERE DeDe.departamento='{self.view.departamento_input.currentText()}';"
         professores = self.conexao.select_all(comando_sql=comando_sql)
         for professor in professores:
-            self.view.professor_input.addItem(f"{professor[1]} {professor[2]}")
+            self.view.professor_input.addItem(f'{professor[0]} {professor[1]}')
 
     def cadastra_disciplina(self):
         disciplina = Disciplina(
             disciplina=self.view.disciplina_input.displayText(),
-            departamento=self.view.departamento_input.currentItem().text(),
+            departamento=self.view.departamento_input.currentText(),
             cod_disciplina=self.view.cod_input.displayText(),
             professor=self.view.professor_input.currentItem().text(),
         )

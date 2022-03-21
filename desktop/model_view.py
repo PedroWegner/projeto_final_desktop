@@ -36,6 +36,7 @@ class TelaLogin():
             self.menu_aluno.exibe_tela()
             return
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Professor']:
+            self.menu_professor.usuario_logado = self.usuario_logado
             self.menu_professor.exibe_tela()
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Administrador']:
             self.menu_admin.usuario_logado = self.usuario_logado
