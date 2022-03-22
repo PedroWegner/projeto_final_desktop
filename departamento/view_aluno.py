@@ -9,7 +9,7 @@ class CadastraAluno(InformacoaPessoa):
     def __init__(self):
         super().__init__()
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastroaluno.ui')
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastro_aluno.ui')
         self.tipo_cadastro = None
 
     def exibe_output(self):
@@ -75,7 +75,7 @@ class AtualizaAluno(InformacoaPessoa):
     def __init__(self):
         super().__init__()
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\atualizaraluno.ui')
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\atualizar_aluno.ui')
         self.exibe_output()
 
     def exibe_tela(self):
@@ -119,7 +119,7 @@ class VisualizaAluno():  # ARRUMA AQUI
         self.conexao = ConexaoBD()
         self.app = QtWidgets.QApplication([])
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\visualizaaluno.ui')
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\visualiza_aluno.ui')
 
     def exibe_tela(self):
         self.exibe_aluno()
@@ -139,7 +139,7 @@ class MenuAluno(UtilDepartamento):
     def __init__(self, usuario_logado=None):
         super().__init__()
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menualuno.ui'
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_aluno.ui'
         )
         self.usuario_logado = usuario_logado
         self.menu_atualiza = MenuAlunoAtualiza()
@@ -170,7 +170,7 @@ class MenuAlunoAtualiza(InformacoaPessoa):
     def __init__(self, usuario_logado=None):
         super().__init__()
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menuatualizaaluno.ui'
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_atualiza_aluno.ui'
         )
         self.usuario_logado = usuario_logado
 
@@ -204,7 +204,7 @@ class MatriculaDisciplina(UtilDepartamento):
     def __init__(self, usuario_logado=None):
         super().__init__()
         self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\matriculardisciplina.ui'
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\matricular_disciplina.ui'
         )
         self.usuario_logado = usuario_logado
 

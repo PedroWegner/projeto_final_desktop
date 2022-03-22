@@ -135,6 +135,7 @@ class Aluno(DepartamentoUtil, object):
         return resultado
 
     def cadastra_aluno(self):
+        self.usuario.cadastrar_usuario()
         comando_sql = "INSERT INTO departamento_aluno (pessoa_id, usuario_id) VALUES (%s, %s)"
 
         tupla = (
@@ -199,6 +200,7 @@ class Professor(DepartamentoUtil, object):
         self.disciplina = disciplina
 
     def cadastrar_professor(self):
+        self.usuario.cadastrar_usuario()
         comando_sql = "INSERT INTO departamento_professor (pessoa_id, titulo_id, usuario_id) VALUES (%s, %s, %s)"
         tupla = (
             self.pessoa.id,

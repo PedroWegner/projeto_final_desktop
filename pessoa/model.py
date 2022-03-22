@@ -190,7 +190,7 @@ class Usuario(PessoaUtil, object):
         self.email = email
         self.senha = senha
         self.tipo_usuario = tipo_usuario
-        self.cadastrar_usuario()
+        # self.cadastrar_usuario()
 
     def criptografa_senha(self):
         senha_criptografada = bcrypt.hashpw(
@@ -211,6 +211,7 @@ class Usuario(PessoaUtil, object):
             self.pessoa.id,
             self.tipo_usuario,
         )
+        print(tupla)
 
         self.conexao.executa_insert(
             comando_sql=comando_sql,
@@ -219,3 +220,8 @@ class Usuario(PessoaUtil, object):
 
         comando_sql = 'SELECT id FROM pessoa_usuario ORDER BY id DESC LIMIT 1'
         self.id = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
+
+    def atualiza_senha(self, senha_nova=None):
+        self.senha = senha_nova
+        comando_sql = f"UPDATE pessoa_usuario SET senha='{str(self.criptografa_senha())[2:-1]}' WHERE id={self.id}"
+        self.conexao.executa_update(comando_sql=comando_sql)
