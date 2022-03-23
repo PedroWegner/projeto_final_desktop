@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>916</width>
-    <height>573</height>
+    <height>672</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,10 +77,10 @@
   <widget class="QLabel" name="bem_vindo">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>40</y>
-     <width>361</width>
-     <height>31</height>
+     <x>70</x>
+     <y>30</y>
+     <width>761</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="font">

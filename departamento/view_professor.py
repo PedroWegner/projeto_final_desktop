@@ -2,6 +2,8 @@ from PyQt5 import QtWidgets, uic, QtGui
 from departamento.views import UtilDepartamento, InformacoaPessoa
 from departamento.model import Professor
 from pessoa.model import Usuario, Pessoa, Endereco
+from departamento.views_usuario import AtualizarSenha
+from departamento.view_disciplina import TelaDisciplinaProfessor
 from banco_dados.model import ConexaoBD
 import bcrypt
 
@@ -96,13 +98,13 @@ class MenuProfessor(UtilDepartamento):
     def exibe_tela(self):
         super().exibe_tela()
         self.id_professor()
-        self.exibe_materias()
+        self.exibe_disciplinas()
         self.atualiza_senha.usuario_logado = self.usuario_logado
         self.view.atualizar_senha_btn.clicked.connect(self.atualiza_senha.exibe_tela)
         self.view.bem_vindo.setText(
             f"Bem-vindo {self.usuario_logado['nome_pessoa']} {self.usuario_logado['sobrenome_pessoa']}")
 
-    def exibe_materias(self):
+    def exibe_disciplinas(self):
         comando_sql = f"SELECT * " \
                       f"FROM departamento_disciplina DeDi " \
                       f"INNER JOIN departamento_professor DePr " \
@@ -112,7 +114,7 @@ class MenuProfessor(UtilDepartamento):
 
         for numero, disciplina in enumerate(discplinas_selecionas):
             self.btn = QtWidgets.QPushButton(disciplina[1])
-            tela = TelaDisciplina(
+            tela = TelaDisciplinaProfessor(
                 disciplina=disciplina[1],
                 usuario_logado=self.usuario_logado,
             )
@@ -135,56 +137,5 @@ class MenuProfessor(UtilDepartamento):
         )
 
 
-class TelaDisciplina(UtilDepartamento):
-    def __init__(self, disciplina=None, usuario_logado=None):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\tela_disciplina.ui'
-        )
-        self.disciplina = disciplina
-        self.usuario_logado = usuario_logado
 
-    def exibe_tela(self):
-        super().exibe_tela()
-        self.view.label.setText(self.disciplina)
-
-# ALTERAR O MODULO DESTA CLASS
-class AtualizarSenha(UtilDepartamento):
-    def __init__(self, usuario_logado=None):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\atualizar_senha.ui'
-        )
-        self.usuario_logado = usuario_logado
-
-    def exibe_tela(self):
-        super().exibe_tela()
-        self.view.visualizar_senha_btn.clicked.connect(self.visualizar_senha)
-        self.view.atualizar_senha_btn.clicked.connect(self.atualizar_senha)
-
-    def visualizar_senha(self):
-        self.view.senha_antiga.setEchoMode(QtWidgets.QLineEdit.Normal)
-        self.view.nova_input_1.setEchoMode(QtWidgets.QLineEdit.Normal)
-        self.view.nova_input_2.setEchoMode(QtWidgets.QLineEdit.Normal)
-
-    def atualizar_senha(self):
-        comando_sql = f"SELECT senha FROM pessoa_usuario WHERE usuario='{self.usuario_logado['usuario']}'"
-        senha_criptografada = None
-        senha_antiga = self.view.senha_antiga.text()
-        senha_nova_1 = self.view.nova_input_1.text()
-        senha_nova_2 = self.view.nova_input_2.text()
-
-        try:
-            senha_criptografada = self.conexao.executa_fetchone(comando_sql=comando_sql)[0]
-        except:
-            print('deu erro')
-            return
-
-        if bcrypt.checkpw(senha_antiga.encode('utf-8'), senha_criptografada.encode('utf-8')):
-            if senha_nova_1 == senha_nova_2:
-                usuario = Usuario()
-                usuario.id = self.usuario_logado['id_usuario']
-                usuario.atualiza_senha(senha_nova=senha_nova_1)
-            else:
-                print("Senhas incompativeis")
 

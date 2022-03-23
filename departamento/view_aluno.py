@@ -1,8 +1,10 @@
 from PyQt5 import QtWidgets, uic
 from departamento.views import UtilDepartamento, InformacoaPessoa
+from departamento.views_usuario import AtualizarSenha
 from departamento.model import Aluno
 from pessoa.model import Usuario, Pessoa, Endereco
 from banco_dados.model import ConexaoBD
+from departamento.view_disciplina import TelaDisciplinaAluno
 
 
 class CadastraAluno(InformacoaPessoa):
@@ -135,6 +137,8 @@ class VisualizaAluno():  # ARRUMA AQUI
             self.view.listWidget.addItem(aluno.exibe_aluno(id_aluno=qtd_aluno[i][0])[0])
 
 
+## A PARTIR DAQUI SAO CLASSES PURAMENTE DO ALUNO
+
 class MenuAluno(UtilDepartamento):
     def __init__(self, usuario_logado=None):
         super().__init__()
@@ -144,14 +148,48 @@ class MenuAluno(UtilDepartamento):
         self.usuario_logado = usuario_logado
         self.menu_atualiza = MenuAlunoAtualiza()
         self.menu_matricula_disc = MatriculaDisciplina()
+        self.atualizar_senha = AtualizarSenha()
+        self.btn = None
 
     def exibe_tela(self):
         super().exibe_tela()
         self.id_aluno()
+        self.exibi_disciplinas()
+        # messages
+        self.view.bem_vindo.setText(
+            f"Bem-vindo {self.usuario_logado['nome_pessoa']} {self.usuario_logado['sobrenome_pessoa']}")
+        # send logged user
+        self.atualizar_senha.usuario_logado = self.usuario_logado
         self.menu_atualiza.usuario_logado = self.usuario_logado
         self.menu_matricula_disc.usuario_logado = self.usuario_logado
+        # buttons
         self.view.atualiza_btn.clicked.connect(self.menu_atualiza.exibe_tela)
         self.view.btn_matricular.clicked.connect(self.menu_matricula_disc.exibe_tela)
+        self.view.atualizar_senha_btn.clicked.connect(self.atualizar_senha.exibe_tela)
+
+    def exibi_disciplinas(self):
+        # clear no layout
+        comando_sql = f"SELECT DeDi.disciplina " \
+                      f"FROM departamento_aluno DeAl " \
+                      f"INNER JOIN departamento_aluno_disciplina DeAlDi " \
+                      f"ON DeAlDi.aluno_id = DeAl.id " \
+                      f"INNER JOIN departamento_disciplina DeDi " \
+                      f"ON DeDi.id = DeAlDi.disciplina_id " \
+                      f"WHERE DeAl.id={self.usuario_logado['id_aluno']}"
+        disciplinas_selecionadas = self.conexao.select_all(comando_sql=comando_sql)
+
+        for numero, disciplina in enumerate(disciplinas_selecionadas):
+            self.btn = QtWidgets.QPushButton(disciplina[0])
+            tela = TelaDisciplinaAluno(
+                disciplina=disciplina[0],
+                usuario_logado=self.usuario_logado
+            )
+            # ALTERAR AQUI
+            self.btn.clicked.connect(lambda ch, tela=tela: tela.exibe_tela())
+            if numero % 2 == 0:
+                self.view.layout_1.addWidget(self.btn)
+            else:
+                self.view.layout_2.addWidget(self.btn)
 
     def id_aluno(self):
         comando_sql = f"SELECT DeAl.id " \
@@ -240,4 +278,3 @@ class MatriculaDisciplina(UtilDepartamento):
         aluno = Aluno(disciplina=disciplinas)
         aluno.id = self.usuario_logado['id_aluno']
         aluno.matricula_disciplina()
-

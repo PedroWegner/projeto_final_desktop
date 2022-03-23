@@ -6,43 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>903</width>
-    <height>711</height>
+    <width>832</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QLabel" name="label_bemvindo">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>10</y>
-     <width>451</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>24</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
   <widget class="QPushButton" name="atualiza_btn">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>100</y>
-     <width>271</width>
-     <height>51</height>
+     <x>30</x>
+     <y>224</y>
+     <width>176</width>
+     <height>26</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <pointsize>12</pointsize>
+     <pointsize>11</pointsize>
     </font>
    </property>
    <property name="text">
@@ -52,10 +34,59 @@
   <widget class="QPushButton" name="btn_matricular">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>100</y>
-     <width>271</width>
-     <height>51</height>
+     <x>30</x>
+     <y>288</y>
+     <width>129</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Matricular disciplina</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="atualizar_senha_btn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>256</y>
+     <width>106</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Atualizar senha</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>320</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="bem_vindo_2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>16</width>
+     <height>19</height>
     </rect>
    </property>
    <property name="font">
@@ -64,7 +95,47 @@
     </font>
    </property>
    <property name="text">
-    <string>Matricular disciplina</string>
+    <string/>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>230</y>
+     <width>171</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="layout_1"/>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>230</y>
+     <width>171</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="layout_2"/>
+  </widget>
+  <widget class="QLabel" name="bem_vindo">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>30</y>
+     <width>531</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
