@@ -16,8 +16,8 @@
   <widget class="QPushButton" name="btn_cadastra">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>230</y>
+     <x>80</x>
+     <y>220</y>
      <width>251</width>
      <height>61</height>
     </rect>
@@ -31,7 +31,7 @@
     <string>Cadastra departamento</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -64,7 +64,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -96,6 +96,19 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QPushButton" name="voltar_btn">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>230</y>
+     <width>141</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Voltar</string>
+   </property>
   </widget>
  </widget>
  <resources/>

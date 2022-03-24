@@ -5,167 +5,78 @@ from departamento.model import Aluno
 from pessoa.model import Usuario, Pessoa, Endereco
 from banco_dados.model import ConexaoBD
 from departamento.view_disciplina import TelaDisciplinaAluno
+import sys
+from PyQt5.QtWidgets import QDialog
+
+# global variable
+app = QtWidgets.QApplication(sys.argv)
+widget = QtWidgets.QStackedWidget()
 
 
-class CadastraAluno(InformacoaPessoa):
-    def __init__(self):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\cadastro_aluno.ui')
-        self.tipo_cadastro = None
-
-    def exibe_output(self):
-        self.tipo_tela()
-        super().exibe_output()
-        self.exibe_curso()
-
-    def exibe_tela(self):
-        self.exibe_output()
-        super().exibe_tela()
-        self.view.pushButton.clicked.connect(self.cadastro_de_pessoa)
-
-    def tipo_tela(self):
-        self.tipo_cadastro = self.conexao.executa_fetchone(
-            comando_sql='SELECT id FROM pessoa_tipousuario WHERE tipo_usuario="Aluno"'
-        )[0]
-
-    def exibe_curso(self):
-        self.view.curso_input.clear()
-        comando_sql = "SELECT * FROM departamento_curso"
-        cursos = self.conexao.select_all(comando_sql=comando_sql)
-        for curso in cursos:
-            self.view.curso_input.addItem(curso[1])
-
-    def cadastro_de_pessoa(self):
-        pessoa = Pessoa(
-            nome=self.view.nome_input.displayText(),
-            sobrenome=self.view.sobrenome_input.displayText(),
-            data_nascimento=self.view.data_nasc_input.displayText(),
-            cpf=self.view.cpf_input.displayText(),
-            estado_civil=self.view.estado_civil_input.currentText(),
-            genero=self.view.genero_input.currentText(),
-            endereco=Endereco(
-                rua=self.view.rua_input.displayText(),
-                numero=self.view.numero_input.displayText(),
-                bairro=self.view.bairro_input.displayText(),
-                cep=self.view.cep_input.displayText(),
-                cidade=self.view.cidade_input.displayText(),
-                estado=self.view.estado_input.currentText(),
-                tipo_endereco=self.view.tipo_end_input.currentText(),
-            )
-        )
-        pessoa.cadastrar_pessoa()
-
-        cursos = self.view.curso_input.selectedItems()
-        curso = []
-        for cur in cursos:
-            curso.append(cur.text())
-        curso = tuple(curso)
-
-        aluno = Aluno(
-            pessoa=pessoa,
-            usuario=Usuario(
-                pessoa=pessoa,
-                tipo_usuario=self.tipo_cadastro
-            ),
-            curso=curso
-        )
-        aluno.cadastra_aluno()
+def executa_aluno(usuario_logado=None):
+    menu_aluno = MenuAluno(usuario_logado=usuario_logado)
+    menu_aluno.id_aluno()
+    widget.addWidget(menu_aluno)
+    widget.setFixedHeight(800)
+    widget.setFixedWidth(1600)
+    widget.show()
+    app.exec()
 
 
-class AtualizaAluno(InformacoaPessoa):
-    def __init__(self):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\atualizar_aluno.ui')
-        self.exibe_output()
-
-    def exibe_tela(self):
-        super().exibe_tela()
-        self.view.pushButton.clicked.connect(self.atualiza_aluno)
-
-    def exibe_output(self):
-        super().exibe_output()
-        self.exibe_aluno()
-
-    def exibe_aluno(self):
-        comando_sql = "SELECT * FROM departamento_aluno"
-        alunos = self.conexao.select_all(comando_sql)
-        for aluno in alunos:
-            self.view.lista_aluno.addItem(str(aluno[0]))
-
-    def atualiza_aluno(self):
-        aluno = Aluno(
-            pessoa=self.view.lista_aluno.currentText()
-        )
-        aluno.atualiza_aluno(
-            nome=self.view.nome_input.displayText(),
-            sobrenome=self.view.sobrenome_input.displayText(),
-            data_nascimento=self.view.data_nasc_input.displayText(),
-            estado_civil=self.view.estado_civil_input.currentText(),
-            genero=self.view.genero_input.currentText(),
-            endereco=Endereco(
-                rua=self.view.rua_input.displayText(),
-                numero=self.view.numero_input.displayText(),
-                bairro=self.view.bairro_input.displayText(),
-                cep=self.view.cep_input.displayText(),
-                cidade=self.view.cidade_input.displayText(),
-                estado=self.view.estado_input.currentText(),
-                tipo_endereco=self.view.tipo_end_input.currentText(),
-            )
-        )
-
-
-class VisualizaAluno():  # ARRUMA AQUI
-    def __init__(self):
-        self.conexao = ConexaoBD()
-        self.app = QtWidgets.QApplication([])
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\visualiza_aluno.ui')
-
-    def exibe_tela(self):
-        self.exibe_aluno()
-        self.view.show()
-        self.app.exec()
-
-    def exibe_aluno(self):
-        self.view.listWidget.clear()
-        comando_sql = "SELECT * FROM departamento_aluno"
-        qtd_aluno = self.conexao.select_all(comando_sql=comando_sql)
-        aluno = Aluno()
-        for i in range(len(qtd_aluno)):
-            self.view.listWidget.addItem(aluno.exibe_aluno(id_aluno=qtd_aluno[i][0])[0])
-
-
-## A PARTIR DAQUI SAO CLASSES PURAMENTE DO ALUNO
-
-class MenuAluno(UtilDepartamento):
+class MenuAluno(QDialog, InformacoaPessoa):
     def __init__(self, usuario_logado=None):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_aluno.ui'
+        super(MenuAluno, self).__init__()
+
+        uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_aluno.ui',
+            self
         )
         self.usuario_logado = usuario_logado
-        self.menu_atualiza = MenuAlunoAtualiza()
-        self.menu_matricula_disc = MatriculaDisciplina()
-        self.atualizar_senha = AtualizarSenha()
         self.btn = None
 
-    def exibe_tela(self):
-        super().exibe_tela()
+        # funcoes construtoras
+        self.exibe_informacao()
+
+        # btns singal
+        self.atualiza_btn.clicked.connect(self.abre_atualiza_senha)
+        self.btn_matricular.clicked.connect(self.abre_matricular_disciplina)
+
+    def abre_atualiza_senha(self):
+        try:
+            menu_atualizar_aluno = MenuAlunoAtualiza(usuario_logado=self.usuario_logado)
+            widget.addWidget(menu_atualizar_aluno)
+            widget.setCurrentIndex(widget.currentIndex() + 1)
+        except Exception as e:
+            print(e)
+
+
+    def abre_matricular_disciplina(self):
+        try:
+            matricular_disciplina = MatriculaDisciplina(usuario_logado=self.usuario_logado)
+            widget.addWidget(matricular_disciplina)
+            widget.setCurrentIndex(widget.currentIndex() + 1)
+        except Exception as e:
+            print(e)
+
+
+    def exibe_informacao(self):
         self.id_aluno()
         self.exibi_disciplinas()
         # messages
-        self.view.bem_vindo.setText(
+        self.bem_vindo.setText(
             f"Bem-vindo {self.usuario_logado['nome_pessoa']} {self.usuario_logado['sobrenome_pessoa']}")
         # send logged user
-        self.atualizar_senha.usuario_logado = self.usuario_logado
-        self.menu_atualiza.usuario_logado = self.usuario_logado
-        self.menu_matricula_disc.usuario_logado = self.usuario_logado
+        # self.atualizar_senha.usuario_logado = self.usuario_logado
+        # self.menu_atualiza.usuario_logado = self.usuario_logado
+        # self.menu_matricula_disc.usuario_logado = self.usuario_logado
         # buttons
-        self.view.atualiza_btn.clicked.connect(self.menu_atualiza.exibe_tela)
-        self.view.btn_matricular.clicked.connect(self.menu_matricula_disc.exibe_tela)
-        self.view.atualizar_senha_btn.clicked.connect(self.atualizar_senha.exibe_tela)
+        # self.view.atualiza_btn.clicked.connect(self.menu_atualiza.exibe_tela)
+        # self.view.btn_matricular.clicked.connect(self.menu_matricula_disc.exibe_tela)
+        # self.view.atualizar_senha_btn.clicked.connect(self.atualizar_senha.exibe_tela)
+
+    def exibe_tela(self):
+        super().exibe_tela()
+
 
     def exibi_disciplinas(self):
         # clear no layout
@@ -187,11 +98,15 @@ class MenuAluno(UtilDepartamento):
             # ALTERAR AQUI
             self.btn.clicked.connect(lambda ch, tela=tela: tela.exibe_tela())
             if numero % 2 == 0:
-                self.view.layout_1.addWidget(self.btn)
+                self.layout_1.addWidget(self.btn)
             else:
-                self.view.layout_2.addWidget(self.btn)
+                self.layout_2.addWidget(self.btn)
+
+    def abre_disciplina(self, disciplina=None):
+        pass
 
     def id_aluno(self):
+        print(self.usuario_logado)
         comando_sql = f"SELECT DeAl.id " \
                       f"FROM pessoa_usuario PeUs " \
                       f"INNER JOIN departamento_aluno DeAl " \
@@ -204,59 +119,78 @@ class MenuAluno(UtilDepartamento):
         )
 
 
-class MenuAlunoAtualiza(InformacoaPessoa):
+class MenuAlunoAtualiza(QDialog, InformacoaPessoa):  # InformacoaPessoa
     def __init__(self, usuario_logado=None):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_atualiza_aluno.ui'
+        super(MenuAlunoAtualiza, self).__init__()
+
+        uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\menu_atualiza_aluno.ui',
+            self
         )
         self.usuario_logado = usuario_logado
-
-    def exibe_tela(self):
-        super().exibe_tela()
+        self.atualiza_btn.clicked.connect(self.atualiza_aluno)
+        self.voltar_btn.clicked.connect(self.volta)
         self.exibe_output()
-        self.view.atualiza_btn.clicked.connect(self.atualiza_aluno)
+
+    # def exibe_tela(self):
+    #     super().exibe_tela()
+    #     self.exibe_output()
+    #     self.view.atualiza_btn.clicked.connect(self.atualiza_aluno)
+
+    def volta(self):
+        try:
+            menu_aluno = MenuAluno(usuario_logado=self.usuario_logado)
+        except Exception as e:
+            print(e)
+        widget.addWidget(menu_aluno)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
 
     def atualiza_aluno(self):
         pessoa = Pessoa()
         pessoa.id = self.usuario_logado['id_pessoa']
         pessoa.atualiza_pessoa(
-            nome=self.view.nome_input.displayText(),
-            sobrenome=self.view.sobrenome_input.displayText(),
-            data_nascimento=self.view.data_nasc_input.displayText(),
-            genero=self.view.genero_input.currentText(),
-            estado_civil=self.view.estado_civil_input.currentText(),
+            nome=self.nome_input.displayText(),
+            sobrenome=self.sobrenome_input.displayText(),
+            data_nascimento=self.data_nasc_input.displayText(),
+            genero=self.genero_input.currentText(),
+            estado_civil=self.estado_civil_input.currentText(),
             endereco=Endereco(
-                rua=self.view.rua_input.displayText(),
-                numero=self.view.numero_input.displayText(),
-                bairro=self.view.bairro_input.displayText(),
-                cep=self.view.cep_input.displayText(),
-                cidade=self.view.cidade_input.displayText(),
-                estado=self.view.estado_input.currentText(),
-                tipo_endereco=self.view.tipo_end_input.currentText(),
+                rua=self.rua_input.displayText(),
+                numero=self.numero_input.displayText(),
+                bairro=self.bairro_input.displayText(),
+                cep=self.cep_input.displayText(),
+                cidade=self.cidade_input.displayText(),
+                estado=self.estado_input.currentText(),
+                tipo_endereco=self.tipo_end_input.currentText(),
             )
         )
+        self.usuario_logado['nome_pessoa'] = self.nome_input.displayText()
+        self.usuario_logado['sobrenome_pessoa'] = self.sobrenome_input.displayText()
+        self.usuario_logado['data_nasc_pessoa'] = self.data_nasc_input.displayText()
 
 
-class MatriculaDisciplina(UtilDepartamento):
+class MatriculaDisciplina(QDialog, UtilDepartamento):
     def __init__(self, usuario_logado=None):
-        super().__init__()
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\matricular_disciplina.ui'
+        super(MatriculaDisciplina, self).__init__()
+        uic.loadUi(
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\matricular_disciplina.ui',
+            self
         )
         self.usuario_logado = usuario_logado
 
-    def exibe_tela(self):
-        super().exibe_tela()
-        self.view.matricular_disc_btn.clicked.connect(self.matricular_disciplina)
+        # funcoes construtoras
         self.exibe_output()
+
+        # btn singal
+        self.matricular_disc_btn.clicked.connect(self.matricular_disciplina)
+        self.voltar_btn.clicked.connect(self.volta)
 
     def exibe_output(self):
         super().exibe_output()
         self.exibe_disciplinas()
 
     def exibe_disciplinas(self):
-        self.view.disciplina_input.clear()
+        self.disciplina_input.clear()
         comando_sql = f"SELECT DeDi.disciplina " \
                       f"FROM departamento_disciplina DeDi " \
                       f"WHERE NOT EXISTS (" \
@@ -266,10 +200,18 @@ class MatriculaDisciplina(UtilDepartamento):
                       f")"
         disciplinas = self.conexao.select_all(comando_sql=comando_sql)
         for disciplina in disciplinas:
-            self.view.disciplina_input.addItem(disciplina[0])
+            self.disciplina_input.addItem(disciplina[0])
+
+    def volta(self):
+        try:
+            menu_aluno = MenuAluno(usuario_logado=self.usuario_logado)
+        except Exception as e:
+            print(e)
+        widget.addWidget(menu_aluno)
+        widget.setCurrentIndex(widget.currentIndex() + 1)
 
     def matricular_disciplina(self):
-        disc_selecionadas = self.view.disciplina_input.selectedItems()
+        disc_selecionadas = self.disciplina_input.selectedItems()
         disciplinas = []
         for disciplina in disc_selecionadas:
             disciplinas.append(disciplina.text())

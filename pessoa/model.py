@@ -85,7 +85,7 @@ class Endereco(PessoaUtil, object):
         if self.rua:
             parcela += f"rua='{self.rua}', "
         if self.numero:
-            parcela += f"numero='{self.numero}', '"
+            parcela += f"numero='{self.numero}', "
         if self.bairro:
             parcela += f"bairro='{self.bairro}', "
         if self.cep:
@@ -99,7 +99,7 @@ class Endereco(PessoaUtil, object):
         # comando_sql = f"UPDATE pessoa_endereco SET rua='{self.rua}', numero='{self.numero}', bairro='{self.bairro}', " \
         #               f"cep='{self.cep}', cidade='{self.cidade}', estado_id={self.estado}, tipo_endereco_id={self.tipo_endereco} " \
         #               f"WHERE id={endereco_id}"
-        print(comando_sql)
+        # print(comando_sql)
         self.conexao.executa_update(comando_sql=comando_sql)
 
 
@@ -177,7 +177,7 @@ class Pessoa(PessoaUtil, object):
             parcela += f"estado_civil_id={self.conexao.select_id('pessoa_estadocivil', 'estado_civil', estado_civil)[0]}"
 
         comando_sql = f"UPDATE pessoa_pessoa SET {parcela} WHERE id={id}"
-        print(comando_sql)
+        # print(comando_sql)
         self.conexao.executa_update(comando_sql=comando_sql)
 
 

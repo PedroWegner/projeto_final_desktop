@@ -144,6 +144,19 @@
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="voltar_btn">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>430</y>
+     <width>141</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Voltar</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
