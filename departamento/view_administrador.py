@@ -4,6 +4,7 @@ from departamento.views_usuario import AtualizarSenha
 from departamento.model import Aluno
 from pessoa.model import Usuario, Pessoa, Endereco
 from banco_dados.model import ConexaoBD
+from departamento.view_base import MenuBase
 from departamento.view_disciplina import TelaDisciplinaAluno
 from departamento.model import Curso, Disciplina, Departamento, Aluno, Professor
 from PyQt5.QtWidgets import QDialog
@@ -479,15 +480,13 @@ def executa_menu_adm(usuario_logado=None):
         print(e)
 
 
-class TelaAdministrador(QDialog):
+class TelaAdministrador(QDialog, MenuBase):
     def __init__(self, usuario_logado=None):
-        super(TelaAdministrador, self).__init__()
+        super(TelaAdministrador, self).__init__(usuario_logado=usuario_logado)
         uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\primeiro_teste_tela_integrada.ui',
+            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\departamento\gui\tela_menu_administrador.ui',
             self
         )
-        self.conexao = ConexaoBD()
-        self.usuario_logado = usuario_logado
 
         # btn singals  - HOME - #
         # HOME
@@ -534,82 +533,82 @@ class TelaAdministrador(QDialog):
 
         # FIM btn singals - HOME #
 
-    # FUNCOES INPUTS #
-    def input_departamento(self, input=None):
-        try:
-            input.clear()
-            comando_sql = "SELECT * FROM departamento_departamento"
-            departamentos = self.conexao.select_all(comando_sql=comando_sql)
-            for departamento in departamentos:
-                input.addItem(departamento[1])
-        except Exception as e:
-            print(e)
-
-    def input_turno(self, input=None):
-        try:
-            comando_sql = "SELECT * FROM departamento_turno"
-            turnos = self.conexao.select_all(comando_sql=comando_sql)
-            for turno in turnos:
-                input.addItem(turno[1])
-        except Exception as e:
-            print(e)
-
-    def input_professor(self, input=None, input_dep=None):
-        try:
-            input.clear()
-            comando_sql = f"SELECT PePe.nome, PePe.sobrenome " \
-                          f"FROM departamento_departamento DeDe " \
-                          f"INNER JOIN departamento_professor_departamento DePrDe " \
-                          f"ON DeDe.id = DePrDe.departamento_id " \
-                          f"INNER JOIN departamento_professor DePr " \
-                          f"ON DePr.id = DePrDe.professor_id " \
-                          f"INNER JOIN pessoa_pessoa PePe " \
-                          f"ON DePr.pessoa_id = PePe.id " \
-                          f"WHERE DeDe.departamento='{input_dep.currentText()}';"
-            professores = self.conexao.select_all(comando_sql=comando_sql)
-            for professor in professores:
-                input.addItem(f'{professor[0]} {professor[1]}')
-        except Exception as e:
-            print(e)
-
-    def input_curso(self, input=None):
-        input.clear()
-        comando_sql = "SELECT * FROM departamento_curso"
-        cursos = self.conexao.select_all(comando_sql=comando_sql)
-        for curso in cursos:
-            input.addItem(curso[1])
-
-    def input_titulo(self, input=None):
-        comando_sql = "SELECT * FROM departamento_tituloprofessor"
-        titulos = self.conexao.select_all(comando_sql=comando_sql)
-        for titulo in titulos:
-            input.addItem(titulo[1])
-
-    def input_genero(self, input=None):
-        comando_sql = "SELECT * FROM pessoa_genero"
-        generos = self.conexao.select_all(comando_sql)
-        for genero in generos:
-            input.addItem(genero[1])
-
-    def input_estado_civil(self, input=None):
-        comando_sql = "SELECT * FROM pessoa_estadocivil"
-        estados_civil = self.conexao.select_all(comando_sql)
-        for estado_civil in estados_civil:
-            input.addItem(estado_civil[1])
-
-    def input_estado(self, input=None):
-        comando_sql = "SELECT * FROM pessoa_estado"
-        estados = self.conexao.select_all(comando_sql)
-        for estado in estados:
-            input.addItem(estado[1])
-
-    def input_tipo_endereco(self, input=None):
-        comando_sql = "SELECT * FROM pessoa_tipoendereco"
-        tipos_endereco = self.conexao.select_all(comando_sql)
-        for tipo_endereco in tipos_endereco:
-            input.addItem(tipo_endereco[1])
-
-    # FIM DOS INPUTS #
+    # # FUNCOES INPUTS #
+    # def input_departamento(self, input=None):
+    #     try:
+    #         input.clear()
+    #         comando_sql = "SELECT * FROM departamento_departamento"
+    #         departamentos = self.conexao.select_all(comando_sql=comando_sql)
+    #         for departamento in departamentos:
+    #             input.addItem(departamento[1])
+    #     except Exception as e:
+    #         print(e)
+    #
+    # def input_turno(self, input=None):
+    #     try:
+    #         comando_sql = "SELECT * FROM departamento_turno"
+    #         turnos = self.conexao.select_all(comando_sql=comando_sql)
+    #         for turno in turnos:
+    #             input.addItem(turno[1])
+    #     except Exception as e:
+    #         print(e)
+    #
+    # def input_professor(self, input=None, input_dep=None):
+    #     try:
+    #         input.clear()
+    #         comando_sql = f"SELECT PePe.nome, PePe.sobrenome " \
+    #                       f"FROM departamento_departamento DeDe " \
+    #                       f"INNER JOIN departamento_professor_departamento DePrDe " \
+    #                       f"ON DeDe.id = DePrDe.departamento_id " \
+    #                       f"INNER JOIN departamento_professor DePr " \
+    #                       f"ON DePr.id = DePrDe.professor_id " \
+    #                       f"INNER JOIN pessoa_pessoa PePe " \
+    #                       f"ON DePr.pessoa_id = PePe.id " \
+    #                       f"WHERE DeDe.departamento='{input_dep.currentText()}';"
+    #         professores = self.conexao.select_all(comando_sql=comando_sql)
+    #         for professor in professores:
+    #             input.addItem(f'{professor[0]} {professor[1]}')
+    #     except Exception as e:
+    #         print(e)
+    #
+    # def input_curso(self, input=None):
+    #     input.clear()
+    #     comando_sql = "SELECT * FROM departamento_curso"
+    #     cursos = self.conexao.select_all(comando_sql=comando_sql)
+    #     for curso in cursos:
+    #         input.addItem(curso[1])
+    #
+    # def input_titulo(self, input=None):
+    #     comando_sql = "SELECT * FROM departamento_tituloprofessor"
+    #     titulos = self.conexao.select_all(comando_sql=comando_sql)
+    #     for titulo in titulos:
+    #         input.addItem(titulo[1])
+    #
+    # def input_genero(self, input=None):
+    #     comando_sql = "SELECT * FROM pessoa_genero"
+    #     generos = self.conexao.select_all(comando_sql)
+    #     for genero in generos:
+    #         input.addItem(genero[1])
+    #
+    # def input_estado_civil(self, input=None):
+    #     comando_sql = "SELECT * FROM pessoa_estadocivil"
+    #     estados_civil = self.conexao.select_all(comando_sql)
+    #     for estado_civil in estados_civil:
+    #         input.addItem(estado_civil[1])
+    #
+    # def input_estado(self, input=None):
+    #     comando_sql = "SELECT * FROM pessoa_estado"
+    #     estados = self.conexao.select_all(comando_sql)
+    #     for estado in estados:
+    #         input.addItem(estado[1])
+    #
+    # def input_tipo_endereco(self, input=None):
+    #     comando_sql = "SELECT * FROM pessoa_tipoendereco"
+    #     tipos_endereco = self.conexao.select_all(comando_sql)
+    #     for tipo_endereco in tipos_endereco:
+    #         input.addItem(tipo_endereco[1])
+    #
+    # # FIM DOS INPUTS #
 
     # CONSTRUTORES DE TELA #
 
@@ -718,7 +717,7 @@ class TelaAdministrador(QDialog):
             pessoa=pessoa,
             usuario=Usuario(
                 pessoa=pessoa,
-                tipo_usuario=tipo_cadastro # PRECISA REVISAR AQUUIIIIIIIIIIIIIIIIIIIIIIIII
+                tipo_usuario=tipo_cadastro
             ),
             curso=curso
         )
@@ -806,19 +805,19 @@ class TelaAdministrador(QDialog):
             cpf=self.professor_input_cpf
         )
 
-    def limpa_pessoa(self, rua=None, numero=None, bairro=None, cep=None, cidade=None, nome=None, sobrenome=None, data_nasc=None, cpf=None):
-        rua.clear()
-        numero.clear()
-        bairro.clear()
-        cep.clear()
-        cidade.clear()
-        nome.clear()
-        sobrenome.clear()
-        data_nasc.clear()
-        cpf.clear()
+    # def limpa_pessoa(self, rua=None, numero=None, bairro=None, cep=None, cidade=None, nome=None, sobrenome=None, data_nasc=None, cpf=None):
+    #     rua.clear()
+    #     numero.clear()
+    #     bairro.clear()
+    #     cep.clear()
+    #     cidade.clear()
+    #     nome.clear()
+    #     sobrenome.clear()
+    #     data_nasc.clear()
+    #     cpf.clear()
 
     # FIM FUNCOES DE LIMPA CAMPO #
 
 
 if __name__ == '__main__':
-    excuta_isso()
+    pass

@@ -1,7 +1,7 @@
 import bcrypt
 from PyQt5 import uic, QtWidgets
 from banco_dados.model import ConexaoBD
-from departamento.view_aluno import executa_aluno
+from departamento.view_aluno import executa_menu_aluno
 from departamento.view_professor import executa_professor
 from departamento.view_administrador import executa_menu_adm
 
@@ -29,13 +29,13 @@ class TelaLogin():
 
     def exibe_tela_restricao(self):
         if self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Aluno']:
-            executa_aluno(usuario_logado=self.usuario_logado)
+            # executa_aluno(usuario_logado=self.usuario_logado)
+            executa_menu_aluno(usuario_logado=self.usuario_logado)
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Professor']:
             executa_professor(usuario_logado=self.usuario_logado)
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Administrador']:
             # executa_administrador(usuario_logado=self.usuario_logado)
             executa_menu_adm(usuario_logado=self.usuario_logado)
-
 
     def login(self):
         usuario_entrada = self.view.usuario_input.displayText()
