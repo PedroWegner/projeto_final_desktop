@@ -221,7 +221,7 @@ from PyQt5.QtWidgets import QDialog
 #         aluno.id = self.usuario_logado['id_aluno']
 #         aluno.matricula_disciplina()
 ####################################################
-from departamento.view_base import MenuBase
+from departamento.view_base import MenuBase, DadosPessoa
 
 app = QtWidgets.QApplication([])
 widget = QtWidgets.QStackedWidget()
@@ -237,7 +237,7 @@ def executa_menu_aluno(usuario_logado=None):
     app.exec_()
 
 
-class TelaAluno(QDialog, MenuBase):
+class TelaAluno(QDialog, DadosPessoa):
     def __init__(self, usuario_logado=None):
         super(TelaAluno, self).__init__(usuario_logado=usuario_logado)
         uic.loadUi(
@@ -245,6 +245,7 @@ class TelaAluno(QDialog, MenuBase):
             self
         )
         self.id_aluno()
+        self.btn = None
 
         # btn singals  - MENU - #
         # HOME
@@ -254,6 +255,7 @@ class TelaAluno(QDialog, MenuBase):
 
         # DISCIPLINAS
         self.menu_btn_disciplinas.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_disciplinas))
+        self.menu_btn_disciplinas.clicked.connect(self.disciplinas_construtor)
 
         # ATUALIZAR DADOS
         self.menu_btn_att_dados.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_att_dados))
@@ -267,6 +269,12 @@ class TelaAluno(QDialog, MenuBase):
         self.att_senha_btn_visualizar_senha.clicked.connect(self.visualizar_senha)
         self.att_senha_btn_att_senha.clicked.connect(self.atualizar_senha)
         self.att_senha_btn_att_senha.clicked.connect(self.limpa_att_senha)
+
+        # SOLICITAR DISCIPLINA
+        self.menu_btn_solicitar_disciplina.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_solicitar_disciplina))
+        self.menu_btn_solicitar_disciplina.clicked.connect(self.solicitar_disciplina_construtor)
+        self.solicitar_disciplina_btn_solicitar_disciplina.clicked.connect(self.solicitar_disciplina)
+        self.solicitar_disciplina_btn_solicitar_disciplina.clicked.connect(self.solicitar_disciplina_construtor)
 
         # FIM btn singals  - MENU - #
 
@@ -293,78 +301,124 @@ class TelaAluno(QDialog, MenuBase):
         )
 
     def disciplinas_construtor(self):
-        pass
+        # coluna 1
+        for i in reversed(range(self.disciplinas_layout_disciplina_1.count())):
+            displina_removida = self.disciplinas_layout_disciplina_1.itemAt(i).widget()
+            self.disciplinas_layout_disciplina_1.removeWidget(displina_removida)
+            displina_removida.setParent(None)
+        # coluna 2
+        for i in reversed(range(self.disciplinas_layout_disciplina_2.count())):
+            displina_removida = self.disciplinas_layout_disciplina_2.itemAt(i).widget()
+            self.disciplinas_layout_disciplina_2.removeWidget(displina_removida)
+            displina_removida.setParent(None)
+        #
+        comando_sql = f"SELECT DeDi.id, DeDi.disciplina " \
+                      f"FROM departamento_aluno DeAl " \
+                      f"INNER JOIN departamento_aluno_disciplina DeAlDi " \
+                      f"ON DeAlDi.aluno_id = DeAl.id " \
+                      f"INNER JOIN departamento_disciplina DeDi " \
+                      f"ON DeDi.id = DeAlDi.disciplina_id " \
+                      f"WHERE DeAl.id={self.usuario_logado['id_aluno']}"
+        disciplinas_selecionadas = self.conexao.select_all(comando_sql=comando_sql)
 
-    def att_dados_construtor(self):
-        try:
-            self.input_estado(input=self.att_dados_input_estado)
-            self.input_genero(input=self.att_dados_input_genero)
-            self.input_estado_civil(input=self.att_dados_input_estado_civil)
-            self.input_tipo_endereco(input=self.att_dados_input_tipo_end)
-        except Exception as e:
-            print(e)
+        for numero, disciplina in enumerate(disciplinas_selecionadas):
+                self.btn = QtWidgets.QPushButton(disciplina[1])
+                dict_discplina = {
+                    'id_disciplina': disciplina[0],
+                    'disciplina': disciplina[1],
+                }
+                self.btn.clicked.connect(lambda ch, dict=dict_discplina: self.disciplina_construtor(dict_disciplina=dict))
+                if numero % 2 == 0:
+                    self.disciplinas_layout_disciplina_1.addWidget(self.btn)
+                else:
+                    self.disciplinas_layout_disciplina_2.addWidget(self.btn)
+
+    def disciplina_construtor(self, dict_disciplina=None):
+        self.menu_stacked.setCurrentWidget(self.disciplinas_disciplina)
+        self.disciplina_label_disciplina.setText(f"{dict_disciplina['disciplina']}")
+
+    def solicitar_disciplina_construtor(self):
+        self.input_disciplinas(input=self.solicitar_disciplina_input_disciplinas)
 
     # FIM CONSTRUTORES DE TELA #
 
     # FUNCOES DE TELA #
 
+    # DISCIPLINAS #
+
+
+
+    # FIM DISCIPLINAS #
+
     # ATT DADOS #
-    def att_dados(self):
-        super().att_dados(
-            input_nome=self.att_dados_input_nome,
-            input_sobrenome=self.att_dados_input_sobrenome,
-            input_data_nasc=self.att_dados_input_data_nasc,
-            input_genero=self.att_dados_input_genero,
-            input_estado_civil=self.att_dados_input_estado_civil,
-            input_rua=self.att_dados_input_rua,
-            input_numero=self.att_dados_input_numero,
-            input_bairro=self.att_dados_input_bairro,
-            input_cep=self.att_dados_input_cep,
-            input_cidade=self.att_dados_input_cidade,
-            input_estado=self.att_dados_input_estado,
-            input_tipo_end=self.att_dados_input_tipo_end,
-        )
-    # FIM ATT DADOS #
-
-    # SENHA #
-    def visualizar_senha(self):
-        super().visualizar_senha(
-            (
-                self.att_senha_input_senha_antiga,
-                self.att_senha_input_verifica_1,
-                self.att_senha_input_verifica_2,
-            )
-        )
-
-
-    def atualizar_senha(self):
-        super().atualizar_senha(
-            input_senha_antiga=self.att_senha_input_senha_antiga,
-            input_senha_nova_1=self.att_senha_input_verifica_1,
-            input_senha_nova_2=self.att_senha_input_verifica_2,
-        )
+    # def att_dados(self):
+    #     super().att_dados(
+    #         input_nome=self.att_dados_input_nome,
+    #         input_sobrenome=self.att_dados_input_sobrenome,
+    #         input_data_nasc=self.att_dados_input_data_nasc,
+    #         input_genero=self.att_dados_input_genero,
+    #         input_estado_civil=self.att_dados_input_estado_civil,
+    #         input_rua=self.att_dados_input_rua,
+    #         input_numero=self.att_dados_input_numero,
+    #         input_bairro=self.att_dados_input_bairro,
+    #         input_cep=self.att_dados_input_cep,
+    #         input_cidade=self.att_dados_input_cidade,
+    #         input_estado=self.att_dados_input_estado,
+    #         input_tipo_end=self.att_dados_input_tipo_end,
+    #     )
+    # # FIM ATT DADOS #
+    #
+    # # SENHA #
+    # def visualizar_senha(self):
+    #     super().visualizar_senha(
+    #         (
+    #             self.att_senha_input_senha_antiga,
+    #             self.att_senha_input_verifica_1,
+    #             self.att_senha_input_verifica_2,
+    #         )
+    #     )
+    #
+    # def atualizar_senha(self):
+    #     super().atualizar_senha(
+    #         input_senha_antiga=self.att_senha_input_senha_antiga,
+    #         input_senha_nova_1=self.att_senha_input_verifica_1,
+    #         input_senha_nova_2=self.att_senha_input_verifica_2,
+    #     )
     # FIM SENHA #
+
+    # SOLICITA DISCIPLINA #
+    def solicitar_disciplina(self):
+        disc_selecionadas = self.solicitar_disciplina_input_disciplinas.selectedItems()
+        disciplinas = []
+        for disciplina in disc_selecionadas:
+            disciplinas.append(disciplina.text())
+        disciplinas = tuple(disciplinas)
+
+        aluno = Aluno(disciplina=disciplinas)
+        aluno.id = self.usuario_logado['id_aluno']
+        aluno.matricula_disciplina()
+    # FIM SOLICITA DISCIPLINA #
 
     # FIM FUNCOES DE TELA #
 
-    # FUNCOES DE LIMPA CAMPO #
-    def limpa_att_senha(self):
-        self.att_senha_input_senha_antiga.clear()
-        self.att_senha_input_verifica_1.clear()
-        self.att_senha_input_verifica_2.clear()
-
-    def limpa_att_dados(self):
-        self.limpa_pessoa(
-            rua=self.att_dados_input_rua,
-            numero=self.att_dados_input_numero,
-            bairro=self.att_dados_input_bairro,
-            cep=self.att_dados_input_cep,
-            cidade=self.att_dados_input_cidade,
-            nome=self.att_dados_input_nome,
-            sobrenome=self.att_dados_input_sobrenome,
-            data_nasc=self.att_dados_input_data_nasc,
-        )
-    # FIM FUNCOS DE LIMPA CAMPO #
+    # # FUNCOES DE LIMPA CAMPO #
+    # def limpa_att_senha(self):
+    #     self.att_senha_input_senha_antiga.clear()
+    #     self.att_senha_input_verifica_1.clear()
+    #     self.att_senha_input_verifica_2.clear()
+    #
+    # def limpa_att_dados(self):
+    #     self.limpa_pessoa(
+    #         rua=self.att_dados_input_rua,
+    #         numero=self.att_dados_input_numero,
+    #         bairro=self.att_dados_input_bairro,
+    #         cep=self.att_dados_input_cep,
+    #         cidade=self.att_dados_input_cidade,
+    #         nome=self.att_dados_input_nome,
+    #         sobrenome=self.att_dados_input_sobrenome,
+    #         data_nasc=self.att_dados_input_data_nasc,
+    #     )
+    # # FIM FUNCOES DE LIMPA CAMPO #
 
 
 ##

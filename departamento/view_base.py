@@ -84,6 +84,20 @@ class MenuBase:
         for tipo_endereco in tipos_endereco:
             input.addItem(tipo_endereco[1])
 
+    def input_disciplinas(self, input=None):
+        input.clear()
+        comando_sql = f"SELECT DeDi.disciplina " \
+                      f"FROM departamento_disciplina DeDi " \
+                      f"WHERE NOT EXISTS (" \
+                      f"SELECT * " \
+                      f"FROM departamento_aluno_disciplina DeAlDi " \
+                      f"WHERE DeDi.id = DeAlDi.disciplina_id AND DeAlDi.aluno_id={self.usuario_logado['id_aluno']}" \
+                      f")"
+        print(comando_sql)
+        disciplinas = self.conexao.select_all(comando_sql=comando_sql)
+        for disciplina in disciplinas:
+            input.addItem(disciplina[0])
+
     # FIM DOS INPUTS #
 
     # FUNCOES LIMPA DE CAMPO #
@@ -165,6 +179,80 @@ class MenuBase:
                 print("Senhas incompativeis")  # AQUI QUE FAZ UM TROÇO PARA FALAR QUE DEU ERRADO!
 
         # FIM SENHA #
+
+class DadosPessoa(MenuBase):
+    def __init__(self, usuario_logado=None):
+        super().__init__(usuario_logado=usuario_logado)
+
+    # CONTRUTORES DE TELA #
+    def att_dados_construtor(self):
+        try:
+            self.input_estado(input=self.att_dados_input_estado)
+            self.input_genero(input=self.att_dados_input_genero)
+            self.input_estado_civil(input=self.att_dados_input_estado_civil)
+            self.input_tipo_endereco(input=self.att_dados_input_tipo_end)
+        except Exception as e:
+            print(e)
+    # FIM CONTRUTORES DE TELA #
+
+    # FUNCOES DE TELA #
+    # ATT DADOS #
+    def att_dados(self):
+        super().att_dados(
+            input_nome=self.att_dados_input_nome,
+            input_sobrenome=self.att_dados_input_sobrenome,
+            input_data_nasc=self.att_dados_input_data_nasc,
+            input_genero=self.att_dados_input_genero,
+            input_estado_civil=self.att_dados_input_estado_civil,
+            input_rua=self.att_dados_input_rua,
+            input_numero=self.att_dados_input_numero,
+            input_bairro=self.att_dados_input_bairro,
+            input_cep=self.att_dados_input_cep,
+            input_cidade=self.att_dados_input_cidade,
+            input_estado=self.att_dados_input_estado,
+            input_tipo_end=self.att_dados_input_tipo_end,
+        )
+
+    # FIM ATT DADOS #
+
+    # SENHA #
+    def visualizar_senha(self):
+        super().visualizar_senha(
+            (
+                self.att_senha_input_senha_antiga,
+                self.att_senha_input_verifica_1,
+                self.att_senha_input_verifica_2,
+            )
+        )
+
+    def atualizar_senha(self):
+        super().atualizar_senha(
+            input_senha_antiga=self.att_senha_input_senha_antiga,
+            input_senha_nova_1=self.att_senha_input_verifica_1,
+            input_senha_nova_2=self.att_senha_input_verifica_2,
+        )
+
+    # FIM FUNCOES DE TELA #
+
+    # FUNCOES DE LIMPA CAMPO #
+    def limpa_att_senha(self):
+        self.att_senha_input_senha_antiga.clear()
+        self.att_senha_input_verifica_1.clear()
+        self.att_senha_input_verifica_2.clear()
+
+    def limpa_att_dados(self):
+        self.limpa_pessoa(
+            rua=self.att_dados_input_rua,
+            numero=self.att_dados_input_numero,
+            bairro=self.att_dados_input_bairro,
+            cep=self.att_dados_input_cep,
+            cidade=self.att_dados_input_cidade,
+            nome=self.att_dados_input_nome,
+            sobrenome=self.att_dados_input_sobrenome,
+            data_nasc=self.att_dados_input_data_nasc,
+        )
+    # FIM FUNCOES DE LIMPA CAMPO #
+
 
 
 if __name__ == '__main__':

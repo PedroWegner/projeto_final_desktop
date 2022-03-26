@@ -16,8 +16,8 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>80</y>
+     <x>30</x>
+     <y>50</y>
      <width>171</width>
      <height>731</height>
     </rect>
@@ -51,20 +51,13 @@
       </property>
      </widget>
     </item>
-    <item>
-     <widget class="QPushButton" name="menu_btn_solicitar_disciplina">
-      <property name="text">
-       <string>Solicitar disciplina</string>
-      </property>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QStackedWidget" name="menu_stacked">
    <property name="geometry">
     <rect>
-     <x>250</x>
-     <y>80</y>
+     <x>260</x>
+     <y>50</y>
      <width>1241</width>
      <height>751</height>
     </rect>
@@ -120,10 +113,10 @@
     <widget class="QLabel" name="disciplina_label_disciplina">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>170</y>
-       <width>571</width>
-       <height>341</height>
+       <x>0</x>
+       <y>-10</y>
+       <width>411</width>
+       <height>301</height>
       </rect>
      </property>
      <property name="font">
@@ -133,6 +126,34 @@
      </property>
      <property name="text">
       <string>TextLabel</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>240</y>
+       <width>251</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Aluno matriculados</string>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="disciplina_output_alunos_matriculados">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>290</y>
+       <width>391</width>
+       <height>401</height>
+      </rect>
      </property>
     </widget>
    </widget>
@@ -578,47 +599,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="menu_solicitar_disciplina">
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>290</x>
-       <y>120</y>
-       <width>231</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Selecione as disciplinas:</string>
-     </property>
-    </widget>
-    <widget class="QListWidget" name="solicitar_disciplina_input_disciplinas">
-     <property name="geometry">
-      <rect>
-       <x>280</x>
-       <y>160</y>
-       <width>256</width>
-       <height>192</height>
-      </rect>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ContiguousSelection</enum>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="solicitar_disciplina_btn_solicitar_disciplina">
-     <property name="geometry">
-      <rect>
-       <x>300</x>
-       <y>380</y>
-       <width>231</width>
-       <height>81</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Matricular disciplina</string>
-     </property>
     </widget>
    </widget>
   </widget>

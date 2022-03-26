@@ -189,6 +189,7 @@ class Aluno(DepartamentoUtil, object):
             )
 
 
+
 class Professor(DepartamentoUtil, object):
     def __init__(self, titulo=None, usuario=None, pessoa=None, departamento=None, disciplina=None):
         super().__init__()
