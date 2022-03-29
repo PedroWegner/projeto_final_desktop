@@ -180,6 +180,7 @@ class MenuBase:
 
         # FIM SENHA #
 
+
 class DadosPessoa(MenuBase):
     def __init__(self, usuario_logado=None):
         super().__init__(usuario_logado=usuario_logado)
@@ -252,8 +253,6 @@ class DadosPessoa(MenuBase):
             data_nasc=self.att_dados_input_data_nasc,
         )
     # FIM FUNCOES DE LIMPA CAMPO #
-
-
 
 if __name__ == '__main__':
     pass
