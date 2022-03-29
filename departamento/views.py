@@ -32,25 +32,25 @@ class InformacoaPessoa(UtilDepartamento):
         comando_sql = "SELECT * FROM pessoa_genero"
         generos = self.conexao.select_all(comando_sql)
         for genero in generos:
-            self.view.genero_input.addItem(genero[1])
+            self.genero_input.addItem(genero[1])
 
     def exibe_estado_civil(self):
         comando_sql = "SELECT * FROM pessoa_estadocivil"
         estados_civil = self.conexao.select_all(comando_sql)
         for estado_civil in estados_civil:
-            self.view.estado_civil_input.addItem(estado_civil[1])
+            self.estado_civil_input.addItem(estado_civil[1])
 
     def exibe_estado(self):
         comando_sql = "SELECT * FROM pessoa_estado"
         estados = self.conexao.select_all(comando_sql)
         for estado in estados:
-            self.view.estado_input.addItem(estado[1])
+            self.estado_input.addItem(estado[1])
 
     def exibe_tipo_endereco(self):
         comando_sql = "SELECT * FROM pessoa_tipoendereco"
         tipos_endereco = self.conexao.select_all(comando_sql)
         for tipo_endereco in tipos_endereco:
-            self.view.tipo_end_input.addItem(tipo_endereco[1])
+            self.tipo_end_input.addItem(tipo_endereco[1])
 
 
 class CadastraDepartamento(UtilDepartamento):

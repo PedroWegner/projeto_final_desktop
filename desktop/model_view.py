@@ -1,9 +1,9 @@
 import bcrypt
 from PyQt5 import uic, QtWidgets
 from banco_dados.model import ConexaoBD
-from departamento.views import CadastraDepartamento, CadastraCurso, CadastraDisciplina
-from departamento.view_aluno import CadastraAluno, VisualizaAluno, AtualizaAluno, MenuAluno
-from departamento.view_professor import CadastraProfessor, MenuProfessor
+from departamento.view_aluno import executa_menu_aluno
+from departamento.view_professor import executa_menu_professor
+from departamento.view_administrador import executa_menu_adm
 
 
 class TelaLogin():
@@ -18,9 +18,6 @@ class TelaLogin():
         self.usuario_logado = {
             'tipo_usuario': None
         }
-        self.menu_aluno = MenuAluno()
-        self.menu_professor = MenuProfessor()
-        self.menu_admin = AreaAdministrativa()
         self.checa_tipo_usuario()
 
     def exibe(self):
@@ -32,15 +29,13 @@ class TelaLogin():
 
     def exibe_tela_restricao(self):
         if self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Aluno']:
-            self.menu_aluno.usuario_logado = self.usuario_logado
-            self.menu_aluno.exibe_tela()
-            return
+            # executa_aluno(usuario_logado=self.usuario_logado)
+            executa_menu_aluno(usuario_logado=self.usuario_logado)
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Professor']:
-            self.menu_professor.usuario_logado = self.usuario_logado
-            self.menu_professor.exibe_tela()
+            executa_menu_professor(usuario_logado=self.usuario_logado)
         elif self.usuario_logado['tipo_usuario'] == self.tipos_usuario['Administrador']:
-            self.menu_admin.usuario_logado = self.usuario_logado
-            self.menu_admin.exibe()
+            # executa_administrador(usuario_logado=self.usuario_logado)
+            executa_menu_adm(usuario_logado=self.usuario_logado)
 
     def login(self):
         usuario_entrada = self.view.usuario_input.displayText()
@@ -85,40 +80,32 @@ class TelaLogin():
             self.tipos_usuario[2][1]: self.tipos_usuario[2][0],
         }
 
-    """
-    self.tipo_tela_usuario = None
-    
-    NA CONDICAO, TENDO O TIPO DO USUARIO:
-    self.tipo_tela_usuario = TELA_COM_RESTRICAO()
-    """
-
-
-class AreaAdministrativa():
-    def __init__(self, usuario_logado=None):
-        self.app = QtWidgets.QApplication([])
-        self.view = uic.loadUi(
-            r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\desktop\gui\main.ui'
-        )
-        self.usuario_logado = usuario_logado
-        self.cadastro_aluno = CadastraAluno()
-        self.visualiza_aluno = VisualizaAluno()
-        self.atualiza_aluno = AtualizaAluno()
-        self.cadastro_dep = CadastraDepartamento()
-        self.cadastra_curso = CadastraCurso()
-        self.cadastra_professor = CadastraProfessor()
-        self.cadastra_disciplina = CadastraDisciplina()
-
-    def exibe(self):
-        self.view.cadastro_aluno.clicked.connect(self.cadastro_aluno.exibe_tela)
-        self.view.visu_aluno.clicked.connect(self.visualiza_aluno.exibe_tela)
-        self.view.att_aluno.clicked.connect(self.atualiza_aluno.exibe_tela)
-        self.view.cadastro_dep.clicked.connect(self.cadastro_dep.exibe_tela)
-        self.view.cadastra_curso.clicked.connect(self.cadastra_curso.exibe_tela)
-        self.view.cadastra_curso.clicked.connect(self.cadastra_curso.exibe_tela)
-        self.view.cadastro_professor.clicked.connect(self.cadastra_professor.exibe_tela)
-        self.view.cadastra_disciplina.clicked.connect(self.cadastra_disciplina.exibe_tela)
-        self.view.show()
-        self.app.exec()
+# class AreaAdministrativa():
+#     def __init__(self, usuario_logado=None):
+#         self.app = QtWidgets.QApplication([])
+#         self.view = uic.loadUi(
+#             r'C:\Users\pedro\Desktop\Trabalho Final Senai\projeto_final_desktop\desktop\gui\main.ui'
+#         )
+#         self.usuario_logado = usuario_logado
+#         self.cadastro_aluno = CadastraAluno()
+#         self.visualiza_aluno = VisualizaAluno()
+#         self.atualiza_aluno = AtualizaAluno()
+#         self.cadastro_dep = CadastraDepartamento()
+#         self.cadastra_curso = CadastraCurso()
+#         self.cadastra_professor = CadastraProfessor()
+#         self.cadastra_disciplina = CadastraDisciplina()
+#
+#     def exibe(self):
+#         self.view.cadastro_aluno.clicked.connect(self.cadastro_aluno.exibe_tela)
+#         self.view.visu_aluno.clicked.connect(self.visualiza_aluno.exibe_tela)
+#         self.view.att_aluno.clicked.connect(self.atualiza_aluno.exibe_tela)
+#         self.view.cadastro_dep.clicked.connect(self.cadastro_dep.exibe_tela)
+#         self.view.cadastra_curso.clicked.connect(self.cadastra_curso.exibe_tela)
+#         self.view.cadastra_curso.clicked.connect(self.cadastra_curso.exibe_tela)
+#         self.view.cadastro_professor.clicked.connect(self.cadastra_professor.exibe_tela)
+#         self.view.cadastra_disciplina.clicked.connect(self.cadastra_disciplina.exibe_tela)
+#         self.view.show()
+#         self.app.exec()
 
 
 if __name__ == '__main__':

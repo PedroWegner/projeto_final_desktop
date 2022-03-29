@@ -52,6 +52,19 @@
     <string>Matricular disciplina</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="voltar_btn">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>480</y>
+     <width>131</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>voltar</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
