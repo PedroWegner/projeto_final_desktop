@@ -510,37 +510,6 @@
       <string>Endereço</string>
      </property>
     </widget>
-    <widget class="QListWidget" name="aluno_input_modulo">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>410</y>
-       <width>371</width>
-       <height>301</height>
-      </rect>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_16">
-     <property name="geometry">
-      <rect>
-       <x>540</x>
-       <y>370</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Modulo</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
