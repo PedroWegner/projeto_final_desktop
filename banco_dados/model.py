@@ -5,7 +5,7 @@ import mysql.connector
 
 
 class ConexaoBD(object):
-    def __init__(self, host='localhost', user='root', password='', db='trabalho_final'):
+    def __init__(self, host='localhost', user='root', password='', db='escola_de_lingua'):
         if not db:
             pass  # levantar exceção
         self.host = host

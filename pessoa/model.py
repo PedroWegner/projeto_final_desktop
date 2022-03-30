@@ -104,7 +104,7 @@ class Endereco(PessoaUtil, object):
 
 
 class Pessoa(PessoaUtil, object):
-    def __init__(self, nome=None, sobrenome=None, data_nascimento=None,
+    def __init__(self, nome=None, sobrenome=None, data_nascimento=None, celular=None,
                  genero=None, cpf=None, data_cadastro=None, endereco=None, estado_civil=None):
         super().__init__()
         self.restricao_pessoa()
@@ -114,6 +114,7 @@ class Pessoa(PessoaUtil, object):
         self.data_nascimento = data_nascimento
         self.genero = genero
         self.cpf = cpf
+        self.celular = celular
         self.data_cadastro = data_cadastro
         self.endereco = endereco
         self.estado_civil = estado_civil
@@ -128,14 +129,15 @@ class Pessoa(PessoaUtil, object):
         self.endereco.cadastrar_endereco()
 
         self.endereco = self.endereco.id
-        comando_sql = "INSERT INTO pessoa_pessoa (nome, sobrenome, data_nascimento, cpf, data_cadastro, estado_civil_id, endereco_id, genero_id) VALUES" \
-                      "(%s, %s, %s, %s , %s, %s, %s, %s)"
+        comando_sql = "INSERT INTO pessoa_pessoa (nome, sobrenome, data_nascimento, cpf, data_cadastro, celular, estado_civil_id, endereco_id, genero_id) VALUES" \
+                      "(%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         tupla = (
             self.nome,
             self.sobrenome,
             self.data_nascimento,
             self.cpf,
             self.data_cadastro,
+            self.celular,
             self.conexao.select_id('pessoa_estadocivil',
                                    'estado_civil', self.estado_civil)[0],
             self.endereco,
@@ -211,7 +213,6 @@ class Usuario(PessoaUtil, object):
             self.pessoa.id,
             self.tipo_usuario,
         )
-        print(tupla)
 
         self.conexao.executa_insert(
             comando_sql=comando_sql,
