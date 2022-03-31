@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QDialog
 from departamento.view_base import DadosPessoa
-from departamento.model import Aula
+from departamento.model import Aula, Atividade
 from datetime import datetime, date
 import os
 import shutil
@@ -31,6 +31,9 @@ class TelaProfessor(QDialog, DadosPessoa):
             self.id_professor()
             self.btn_modulo = None
             self.btn_aula = None
+            self.dict_aula = {
+                'id_aula': None
+            }
 
             # btn singals  - MENU - #
             # HOME
@@ -50,7 +53,7 @@ class TelaProfessor(QDialog, DadosPessoa):
             self.criar_aula_btn_criar_aula.clicked.connect(self.cad_criar_aula)
             self.criar_aula_btn_escolher_video.clicked.connect(
                 lambda: self.seleciona_arquivo(input=self.criar_aula_input_video)
-            )
+            ) # ESSA LAMBDA
             self.criar_aula_btn_escolher_conteudo.clicked.connect(
                 lambda: self.seleciona_arquivo(input=self.criar_aula_input_conteudo_download)
             )
@@ -59,6 +62,13 @@ class TelaProfessor(QDialog, DadosPessoa):
 
             self.aulas_btn_vincula_aula_modulo.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.aulas_vincula_aula_modulo))
             self.aulas_btn_vincula_aula_modulo.clicked.connect(self.vincula_aula_modulo_construtor)
+
+            # ATIVIDADE
+            self.aula_btn_atividade.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.aula_atividade))
+            self.atividade_btn_atividade.clicked.connect(
+                lambda: self.seleciona_arquivo(input=self.atividade_input_atividade)
+            )
+            self.atividade_btn_salvar_atividade.clicked.connect(self.cad_atividade)
 
             # ATUALIZAR DADOS
             self.menu_btn_att_dados.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_att_dados))
@@ -154,34 +164,43 @@ class TelaProfessor(QDialog, DadosPessoa):
 
     def aulas_construtor(self):
         try:
-            comando_sql = f"SELECT DeAu.id, DeAu.aula " \
+            comando_sql = f"SELECT DeAu.* " \
                           f"FROM departamento_aula DeAu " \
                           f"WHERE DeAu.professor_id={self.usuario_logado['id_professor']}"
             aulas = self.conexao.select_all(comando_sql=comando_sql)
+            # ISSO PODE VIRAR UMA FUNCAO
             for i in reversed(range(self.aulas_layout_aula_pronta.count())):
                 objeto = self.aulas_layout_aula_pronta.itemAt(i).widget()
                 self.aulas_layout_aula_pronta.removeWidget(objeto)
                 objeto.setParent(None)
+            # ISSO PODE VIRAR UMA FUNCAO #
             if not aulas:
                 aulas_label_aulas = QtWidgets.QLabel('Não há aulas cadastradas')
                 self.aulas_layout_aula_pronta.addWidget(aulas_label_aulas)
             else:
                 for x, aula in enumerate(aulas):
                     self.btn_aula = QtWidgets.QPushButton(aula[1])
-                    id_aula = aula[0]
-                    self.btn_aula.clicked.connect(lambda cd, id=id_aula: self.aula_construtor(id_aula=id_aula))
+                    dict_aula = {
+                        'id_aula': aula[0],
+                        'aula': aula[1],
+                        'conteudo': aula[2],
+                        'data_post': aula[3],
+                        'aula_gravada': aula[4],
+                        'professor_id': aula[5],
+                        'conteudo_download': aula[6],
+                        'nivel_id': aula[7],
+                    }
+                    self.btn_aula.clicked.connect(lambda cd, dict=dict_aula: self.aula_construtor(dict_aula=dict))
                     self.aulas_layout_aula_pronta.addWidget(self.btn_aula)
         except Exception as e:
             print(e)
 
-    def aula_construtor(self, id_aula=None):
+    def aula_construtor(self, dict_aula=None):
         try:
-            comando_sql = f"SELECT * FROM departamento_aula WHERE id={id_aula}"
-            dados = self.conexao.executa_fetchone(comando_sql=comando_sql)
+            self.dict_aula = dict_aula
             self.menu_stacked.setCurrentWidget(self.aulas_aula)
-            self.aula_label_aula.setText(f"{dados[1]}")
-            self.aula_label_conteudo.setText(f"{dados[2]}")
-
+            self.aula_label_aula.setText(f"{self.dict_aula['aula']}")
+            self.aula_label_conteudo.setText(f"{self.dict_aula['conteudo']}")
         except Exception as e:
             print(e)
 
@@ -224,6 +243,39 @@ class TelaProfessor(QDialog, DadosPessoa):
     # FIM CONSTRUTORES DE TELA #
 
     # FUNCOES DE TELA #
+    def cad_atividade(self):
+        try:
+            # print(self.atividade_input_comentario_atividade.toPlainText())
+            # print(self.atividade_input_atividade.displayText())
+            atividade_arquivo = self.arquivo(input=self.atividade_input_atividade)
+            #
+            ano = date.today().strftime("%Y")
+            mes = date.today().strftime("%m")
+
+            print(self.dict_aula)
+
+            # ARQUIVO ATIVIDADE
+            arquivo_atividade = {
+                'pasta_especifica': 'atividade_postada',
+                'arquivo': atividade_arquivo,
+                'ano': ano,
+                'mes': mes,
+            }
+            self.copia_arquivo(
+                dict=arquivo_atividade,
+                input=self.atividade_input_atividade,
+            )
+            # TEM COISA AQUI QUE PODE VIRAR FUNCAO
+            atividade = Atividade(
+                atividade_doc=fr"{arquivo_atividade['pasta_especifica']}\{arquivo_atividade['ano']}\{arquivo_atividade['mes']}\{arquivo_atividade['arquivo']}",
+                comentario=self.atividade_input_comentario_atividade.toPlainText(),
+                aula=self.dict_aula['id_aula'],
+                professor=self.usuario_logado['id_professor']
+            )
+            atividade.cadastrar_atividade()
+        except Exception as e:
+            print(e)
+
     def cad_criar_aula(self):
         try:
             # ARQUIVOS

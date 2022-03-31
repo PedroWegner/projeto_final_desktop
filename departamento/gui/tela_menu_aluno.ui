@@ -190,6 +190,40 @@
       <string>Download conteudo da aula</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="aula_btn_download_atividade">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>440</y>
+       <width>431</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Download atividade da aula</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="aula_label_atividade_comentario">
+     <property name="geometry">
+      <rect>
+       <x>600</x>
+       <y>550</y>
+       <width>421</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>15</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>TextLabel</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="menu_att_dados">
     <widget class="QWidget" name="layoutWidget_2">

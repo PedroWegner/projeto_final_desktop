@@ -34,6 +34,8 @@ class TelaAluno(QDialog, DadosPessoa):
             self.id_aluno()
             self.btn = None
             self.btn_aula = None
+            self.dict_aula = {}
+            self.dict_atividade = {}
 
             # btn singals  - MENU - #
             # HOME
@@ -147,17 +149,36 @@ class TelaAluno(QDialog, DadosPessoa):
                 'nivel': aula[7],
             }
             self.btn_aula = QtWidgets.QPushButton(dict_aula['aula'])
-            self.btn_aula.clicked.connect(lambda cd, dict=dict_aula: self.aula_construtor(dict_aula=dict_aula))
+            self.btn_aula.clicked.connect(lambda cd, dict=dict_aula: self.aula_construtor(dict_aula=dict))
             self.modulo_layout_aula.addWidget(self.btn_aula)
 
-            ##
-
-
     def aula_construtor(self, dict_aula=None):
-        self.menu_stacked.setCurrentWidget(self.modulo_aula)
-        self.aula_label_aula.setText(f"{dict_aula['aula']}")
-        self.aula_label_conteudo.setText(f"{dict_aula['conteudo']}")
-        self.aula_btn_download_conteudo.clicked.connect(lambda: self.salva_arquivo(arquivo_download=dict_aula['conteudo_download']))
+        try:
+            self.dict_aula = dict_aula
+            comando_sql = f"SELECT * " \
+                          f"FROM departamento_atividade DeAt " \
+                          f"WHERE DeAt.aula_id={self.dict_aula['id_aula']}"
+            atividade = self.conexao.executa_fetchone(comando_sql=comando_sql)
+            if atividade:
+                self.dict_atividade = {
+                    'id_atividade': atividade[0],
+                    'data_post': atividade[1],
+                    'atividade_doc': atividade[2],
+                    'comentario': atividade[3],
+                    'id_aula': atividade[4],
+                    'id_professor': atividade[5]
+                }
+                self.aula_label_atividade_comentario.setText(f"{self.dict_atividade['comentario']}")
+                self.aula_btn_download_atividade.clicked.connect(lambda: self.salva_arquivo(arquivo_download=self.dict_atividade['atividade_doc']))
+            else:
+                self.aula_label_atividade_conteudo.setText(f"Não há atividade nesta aula.")
+            self.menu_stacked.setCurrentWidget(self.modulo_aula)
+            self.aula_label_aula.setText(f"{self.dict_aula['aula']}")
+            self.aula_label_conteudo.setText(f"{self.dict_aula['conteudo']}")
+            self.aula_btn_download_conteudo.clicked.connect(lambda: self.salva_arquivo(arquivo_download=self.dict_aula['conteudo_download']))
+            print(self.dict_atividade)
+        except Exception as e:
+            print(e)
 
     def salva_arquivo(self, arquivo_download=None):
         try:
@@ -166,7 +187,7 @@ class TelaAluno(QDialog, DadosPessoa):
                 parent=self.menu_stacked,
                 caption='Salvar arquivo',
                 directory=r'C:\Users\pedro\Desktop',
-                initialFilter="Text files (*.txt)",
+                initialFilter=".txt",
                 filter=".txt",
             )
             diretorio_download = diretorio_download + extensao
@@ -174,7 +195,6 @@ class TelaAluno(QDialog, DadosPessoa):
         except Exception as e:
             print(e)
 
-        # shutil.copy()
 
     # FIM CONSTRUTORES DE TELA #
 
