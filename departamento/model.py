@@ -353,3 +353,32 @@ class Atividade(DepartamentoUtil):
             )
         except Exception as e:
             print(e)
+
+class EnvioAtividade(DepartamentoUtil):
+    def __init__(self, doc_atividade=None, nota=None, aluno=None, atividade=None):
+        super().__init__()
+        self.data_entrega = datetime.now()
+        self.doc_atividade = doc_atividade
+        self.nota = nota
+        self.aluno = aluno
+        self.atividade = atividade
+
+    def cadastrar_envio_atividade(self):
+        try:
+            comando_sql = f"INSERT INTO departamento_envioatividade (data_entrega, envio_atividade_doc, aluno_id, atividade_id) " \
+                          f"VALUES (%s, %s, %s, %s)"
+
+            tupla = (
+                self.data_entrega,
+                self.doc_atividade,
+                self.aluno,
+                self.atividade,
+            )
+
+            self.conexao.executa_insert(
+                comando_sql=comando_sql,
+                tupla=tupla,
+            )
+
+        except Exception as e:
+            print(e)

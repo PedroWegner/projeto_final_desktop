@@ -173,6 +173,12 @@ class MenuBase:
         if cpf:
             cpf.clear()
 
+    def limpa_layout(self, layout=None):
+        for i in reversed(range(layout.count())):
+            objeto = layout.itemAt(i).widget()
+            layout.removeWidget(objeto)
+            objeto.setParent(None)
+
     # FIM FUNCOES LIMPA DE CAMPO #
 
     # FUNCOES GLOBAIS #
@@ -242,12 +248,15 @@ class MenuBase:
 
 #         # FIM SENHA #
 
-    def arquivo(self, input=None):
-        diretorio, extensao = os.path.splitext(input.displayText())
+    def arquivo(self, input=None, caminho=None):
+        if input:
+            diretorio, extensao = os.path.splitext(input.displayText())
+        else:
+            diretorio, extensao = os.path.splitext(caminho)
         nome_arquivo = diretorio.split('/')[-1]
         return nome_arquivo + extensao
 
-    def copia_arquivo(self, dict=None, input=None):
+    def copia_arquivo(self, dict=None, input=None, diretorio=None):
         caminho_ano = fr"C:\Users\pedro\Desktop\Trabalho Final Senai\trabalho_final_web\media\{dict['pasta_especifica']}\{dict['ano']}"
         caminho_mes = fr"C:\Users\pedro\Desktop\Trabalho Final Senai\trabalho_final_web\media\{dict['pasta_especifica']}\{dict['ano']}\{dict['mes']}"
 
@@ -256,20 +265,25 @@ class MenuBase:
 
         if not os.path.isdir(caminho_mes):
             os.mkdir(caminho_mes)
-
-        caminho_antigo = input.displayText()
+        if input:
+            caminho_antigo = input.displayText()
+        else:
+            caminho_antigo = diretorio
         caminho_novo = os.path.join(caminho_mes, dict['arquivo']) # AQUI POSSO ALTERAR COMO ESSE ARQUIVO SERA SALVO!!!!!
         shutil.copy(caminho_antigo, caminho_novo)
 
     def seleciona_arquivo(self, input=None):
         try:
-            arquivo, _ = QFileDialog.getOpenFileName(
+            arquivo, extensao = QFileDialog.getOpenFileName(
                 parent=self.menu_stacked,
                 caption='Abrir arquivo',
                 directory=r'C:\Users\pedro\Desktop'
             )
-
-            input.setText(arquivo)
+            if input:
+                input.setText(arquivo)
+                return
+            else:
+                return arquivo
         except Exception as e:
             print(e)
 #

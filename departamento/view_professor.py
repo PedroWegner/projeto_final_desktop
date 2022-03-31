@@ -111,16 +111,8 @@ class TelaProfessor(QDialog, DadosPessoa):
 
     def modulos_construtor(self):
         try:
-            # coluna 1
-            for i in reversed(range(self.modulos_layout_modulo_1.count())):
-                modulo_removido = self.modulos_layout_modulo_1.itemAt(i).widget()
-                self.modulos_layout_modulo_1.removeWidget(modulo_removido)
-                modulo_removido.setParent(None)
-            # coluna 2
-            for i in reversed(range(self.modulos_layout_modulo_2.count())):
-                modulo_removido = self.modulos_layout_modulo_2.itemAt(i).widget()
-                self.modulos_layout_modulo_2.removeWidget(modulo_removido)
-                modulo_removido.setParent(None)
+            self.limpa_layout(layout=self.modulos_layout_modulo_1)
+            self.limpa_layout(layout=self.modulos_layout_modulo_2)
             #
             comando_sql = f"SELECT * " \
                           f"FROM departamento_modulo DeMo " \
@@ -168,12 +160,8 @@ class TelaProfessor(QDialog, DadosPessoa):
                           f"FROM departamento_aula DeAu " \
                           f"WHERE DeAu.professor_id={self.usuario_logado['id_professor']}"
             aulas = self.conexao.select_all(comando_sql=comando_sql)
-            # ISSO PODE VIRAR UMA FUNCAO
-            for i in reversed(range(self.aulas_layout_aula_pronta.count())):
-                objeto = self.aulas_layout_aula_pronta.itemAt(i).widget()
-                self.aulas_layout_aula_pronta.removeWidget(objeto)
-                objeto.setParent(None)
-            # ISSO PODE VIRAR UMA FUNCAO #
+            self.limpa_layout(layout=self.aulas_layout_aula_pronta)
+
             if not aulas:
                 aulas_label_aulas = QtWidgets.QLabel('Não há aulas cadastradas')
                 self.aulas_layout_aula_pronta.addWidget(aulas_label_aulas)
@@ -245,8 +233,6 @@ class TelaProfessor(QDialog, DadosPessoa):
     # FUNCOES DE TELA #
     def cad_atividade(self):
         try:
-            # print(self.atividade_input_comentario_atividade.toPlainText())
-            # print(self.atividade_input_atividade.displayText())
             atividade_arquivo = self.arquivo(input=self.atividade_input_atividade)
             #
             ano = date.today().strftime("%Y")
@@ -321,7 +307,6 @@ class TelaProfessor(QDialog, DadosPessoa):
 
         except Exception as e:
             print(e)
-
 
     # DISCIPLINAS #
 

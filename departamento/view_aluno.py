@@ -1,10 +1,10 @@
 import os
 import shutil
-
 from PyQt5 import QtWidgets, uic
-from departamento.model import Aluno
+from departamento.model import EnvioAtividade
 from PyQt5.QtWidgets import QDialog, QFileDialog
 from departamento.view_base import DadosPessoa
+from datetime import date
 
 app = QtWidgets.QApplication([])
 widget = QtWidgets.QStackedWidget()
@@ -89,16 +89,8 @@ class TelaAluno(QDialog, DadosPessoa):
 
     def modulos_construtor(self):
         try:
-            # coluna 1
-            for i in reversed(range(self.modulos_layout_modulo_1.count())):
-                modulo_removido = self.modulos_layout_modulo_1.itemAt(i).widget()
-                self.modulos_layout_modulo_1.removeWidget(modulo_removido)
-                modulo_removido.setParent(None)
-            # coluna 2
-            for i in reversed(range(self.modulos_layout_modulo_2.count())):
-                modulo_removido = self.modulos_layout_modulo_2.itemAt(i).widget()
-                self.modulos_layout_modulo_2.removeWidget(modulo_removido)
-                modulo_removido.setParent(None)
+            self.limpa_layout(layout=self.modulos_layout_modulo_1)
+            self.limpa_layout(layout=self.modulos_layout_modulo_2)
 
             comando_sql = f"SELECT DeMo.id, DeMo.modulo " \
                           f"FROM departamento_aluno DeAl " \
@@ -125,11 +117,7 @@ class TelaAluno(QDialog, DadosPessoa):
     def modulo_construtor(self, dict_modulo=None):
         self.menu_stacked.setCurrentWidget(self.modulos_modulo)
         self.modulo_label_modulo.setText(f"{dict_modulo['modulo']}")
-
-        for i in reversed(range(self.modulo_layout_aula.count())):
-            aula_removida = self.modulo_layout_aula.itemAt(i).widget()
-            self.modulo_layout_aula.removeWidget(aula_removida)
-            aula_removida.setParent(None)
+        self.limpa_layout(layout=self.modulo_layout_aula)
 
         comando_sql = f"SELECT DeAu.* " \
                       f"FROM departamento_aula_modulo DeAuMo " \
@@ -154,29 +142,75 @@ class TelaAluno(QDialog, DadosPessoa):
 
     def aula_construtor(self, dict_aula=None):
         try:
+            self.limpa_layout(layout=self.aula_layout_atividade)
+            self.limpa_layout(layout=self.aula_layout_atividade_entrega)
             self.dict_aula = dict_aula
             comando_sql = f"SELECT * " \
                           f"FROM departamento_atividade DeAt " \
                           f"WHERE DeAt.aula_id={self.dict_aula['id_aula']}"
             atividade = self.conexao.executa_fetchone(comando_sql=comando_sql)
             if atividade:
+                aula_btn_download_atividade = QtWidgets.QPushButton('Download ativdade da aula')
+                self.aula_layout_atividade.addWidget(aula_btn_download_atividade)
                 self.dict_atividade = {
                     'id_atividade': atividade[0],
                     'data_post': atividade[1],
                     'atividade_doc': atividade[2],
                     'comentario': atividade[3],
                     'id_aula': atividade[4],
-                    'id_professor': atividade[5]
+                    'id_professor': atividade[5],
                 }
                 self.aula_label_atividade_comentario.setText(f"{self.dict_atividade['comentario']}")
-                self.aula_btn_download_atividade.clicked.connect(lambda: self.salva_arquivo(arquivo_download=self.dict_atividade['atividade_doc']))
+                aula_btn_download_atividade.clicked.connect(lambda: self.salva_arquivo(arquivo_download=self.dict_atividade['atividade_doc']))
+                #
+                comando_sql = f"SELECT id " \
+                              f"FROM departamento_envioatividade DeEn " \
+                              f"WHERE DeEn.aluno_id = {self.usuario_logado['id_aluno']} " \
+                              f"AND DeEn.atividade_id={self.dict_atividade['id_atividade']}"
+                aluno_tem_atividade = self.conexao.executa_fetchone(comando_sql=comando_sql)
+                if not aluno_tem_atividade:
+                    aula_btn_upload_atividade = QtWidgets.QPushButton("Entregar atividade")
+                    self.aula_layout_atividade_entrega.addWidget(aula_btn_upload_atividade)
+                    aula_btn_upload_atividade.clicked.connect(self.cad_entrega_atividade)
+                else:
+                    aula_label_upload_atividade = QtWidgets.QLabel("Atividade já entregue")
+                    self.aula_layout_atividade_entrega.addWidget(aula_label_upload_atividade)
+
             else:
-                self.aula_label_atividade_conteudo.setText(f"Não há atividade nesta aula.")
+                self.aula_label_atividade_comentario.setText(f"Não há atividade nesta aula.")
+            #
             self.menu_stacked.setCurrentWidget(self.modulo_aula)
             self.aula_label_aula.setText(f"{self.dict_aula['aula']}")
             self.aula_label_conteudo.setText(f"{self.dict_aula['conteudo']}")
             self.aula_btn_download_conteudo.clicked.connect(lambda: self.salva_arquivo(arquivo_download=self.dict_aula['conteudo_download']))
-            print(self.dict_atividade)
+            #
+
+        except Exception as e:
+            print(e)
+
+    def cad_entrega_atividade(self):
+        try:
+            diretorio = self.seleciona_arquivo()
+            atividade_aluno = self.arquivo(caminho=diretorio)
+            ano = date.today().strftime("%Y")
+            mes = date.today().strftime("%m")
+
+            atividade_aluno = {
+                'pasta_especifica': 'atividade_enviada',
+                'arquivo': atividade_aluno,
+                'ano': ano,
+                'mes': mes,
+            }
+            self.copia_arquivo(
+                dict=atividade_aluno,
+                diretorio=diretorio
+            )
+            envio_atividade = EnvioAtividade(
+                doc_atividade= fr"{atividade_aluno['pasta_especifica']}\{atividade_aluno['ano']}\{atividade_aluno['mes']}\{atividade_aluno['arquivo']}",
+                aluno=self.usuario_logado['id_aluno'],
+                atividade=self.dict_atividade['id_atividade']
+            )
+            envio_atividade.cadastrar_envio_atividade()
         except Exception as e:
             print(e)
 
@@ -194,6 +228,7 @@ class TelaAluno(QDialog, DadosPessoa):
             shutil.copy(diretorio_arquivo, diretorio_download)
         except Exception as e:
             print(e)
+
 
 
     # FIM CONSTRUTORES DE TELA #

@@ -190,26 +190,24 @@
       <string>Download conteudo da aula</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="aula_btn_download_atividade">
+    <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>590</x>
-       <y>440</y>
-       <width>431</width>
-       <height>91</height>
+       <x>580</x>
+       <y>450</y>
+       <width>271</width>
+       <height>61</height>
       </rect>
      </property>
-     <property name="text">
-      <string>Download atividade da aula</string>
-     </property>
+     <layout class="QGridLayout" name="aula_layout_atividade"/>
     </widget>
     <widget class="QLabel" name="aula_label_atividade_comentario">
      <property name="geometry">
       <rect>
-       <x>600</x>
-       <y>550</y>
-       <width>421</width>
-       <height>171</height>
+       <x>580</x>
+       <y>520</y>
+       <width>261</width>
+       <height>201</height>
       </rect>
      </property>
      <property name="font">
@@ -217,12 +215,26 @@
        <pointsize>15</pointsize>
       </font>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
      <property name="text">
       <string>TextLabel</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
      </property>
+    </widget>
+    <widget class="QWidget" name="gridLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>870</x>
+       <y>450</y>
+       <width>271</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="aula_layout_atividade_entrega"/>
     </widget>
    </widget>
    <widget class="QWidget" name="menu_att_dados">
