@@ -3,6 +3,7 @@ DOCUMENTAR
 """
 from banco_dados.model import ConexaoBD
 from pessoa.model import Pessoa
+from datetime import datetime
 
 
 class DepartamentoUtil(object):
@@ -235,8 +236,10 @@ class Aluno(DepartamentoUtil, object):
         except Exception as e:
             print(e)
 
+
 class Professor(DepartamentoUtil, object):
-    def __init__(self, usuario=None, pessoa=None, departamento=None, disciplina=None, lingua=None, nivel=None, modulo=None):
+    def __init__(self, usuario=None, pessoa=None, departamento=None, disciplina=None, lingua=None, nivel=None,
+                 modulo=None):
         super().__init__()
         self.id = None
         self.pessoa = pessoa
@@ -288,3 +291,36 @@ class Professor(DepartamentoUtil, object):
                 tupla=tupla,
             )
 
+
+class Aula(DepartamentoUtil):
+    def __init__(self, aula=None, conteudo=None, data_post=None, aula_gravada=None, professor=None, conteudo_aula=None,
+                 nivel=None):
+        super().__init__()
+        self.aula = aula
+        self.conteudo = conteudo
+        self.data_post = datetime.now()
+        self.aula_gravada = aula_gravada
+        self.professor = professor
+        self.conteudo_aula = conteudo_aula
+        self.nivel = nivel
+
+    def cadastrar_aula(self):
+        comando_sql = "INSERT INTO departamento_aula (aula, conteudo, data_post, aula_gravada, professor_id, conteudo_download, nivel_id) " \
+                      "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+
+        tupla = (
+            self.aula,
+            self.conteudo,
+            self.data_post,
+            self.aula_gravada,
+            self.professor,
+            self.conteudo_aula,
+            self.conexao.select_id('departamento_nivellingua', 'nivel', self.nivel)[0],
+        )
+        try:
+            self.conexao.executa_insert(
+                comando_sql=comando_sql,
+                tupla=tupla
+            )
+        except Exception as e:
+            print(e)

@@ -1,6 +1,10 @@
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QDialog
 from departamento.view_base import DadosPessoa
+from departamento.model import Aula
+from datetime import datetime, date
+import os
+import shutil
 
 app = QtWidgets.QApplication([])
 widget = QtWidgets.QStackedWidget()
@@ -25,7 +29,8 @@ class TelaProfessor(QDialog, DadosPessoa):
                 self
             )
             self.id_professor()
-            self.btn = None
+            self.btn_modulo = None
+            self.btn_aula = None
 
             # btn singals  - MENU - #
             # HOME
@@ -33,15 +38,34 @@ class TelaProfessor(QDialog, DadosPessoa):
             self.menu_btn_home.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_home))
             self.menu_btn_home.clicked.connect(self.home_construtor)
 
-            # DISCIPLINAS
+            # MODULOS
             self.menu_btn_modulos.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_modulos))
             self.menu_btn_modulos.clicked.connect(self.modulos_construtor)
+
+            # CRIAR AULA #
+
+            self.menu_btn_aulas.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_aulas))
+            self.menu_btn_aulas.clicked.connect(self.aulas_construtor)
+            #
+            self.criar_aula_btn_criar_aula.clicked.connect(self.cad_criar_aula)
+            self.criar_aula_btn_escolher_video.clicked.connect(
+                lambda: self.seleciona_arquivo(input=self.criar_aula_input_video)
+            )
+            self.criar_aula_btn_escolher_conteudo.clicked.connect(
+                lambda: self.seleciona_arquivo(input=self.criar_aula_input_conteudo_download)
+            )
+            self.aulas_btn_criar_aula.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.aulas_criar_aula))
+            self.aulas_btn_criar_aula.clicked.connect(self.criar_aula_construtor)
+
+            self.aulas_btn_vincula_aula_modulo.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.aulas_vincula_aula_modulo))
+            self.aulas_btn_vincula_aula_modulo.clicked.connect(self.vincula_aula_modulo_construtor)
 
             # ATUALIZAR DADOS
             self.menu_btn_att_dados.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_att_dados))
             self.menu_btn_att_dados.clicked.connect(self.att_dados_construtor)
             self.menu_btn_att_dados.clicked.connect(self.limpa_att_dados)
             self.att_dados_btn_att_dados.clicked.connect(self.att_dados)
+            self.att_dados_btn_att_dados.clicked.connect(self.limpa_att_dados)
 
             # ATUALIZAR SENHA
             self.menu_btn_att_senha.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_att_senha))
@@ -97,16 +121,16 @@ class TelaProfessor(QDialog, DadosPessoa):
                           f"WHERE DePr.id={self.usuario_logado['id_professor']}"
             modulos_selecionados = self.conexao.select_all(comando_sql=comando_sql)
             for x, modulo in enumerate(modulos_selecionados):
-                self.btn = QtWidgets.QPushButton(modulo[1])
+                self.btn_modulo = QtWidgets.QPushButton(modulo[1])
                 dict_modulo = {
                     'id_modulo': modulo[0],
                     'modulo': modulo[1],
                 }
-                self.btn.clicked.connect(lambda ch, dict=dict_modulo: self.modulo_construtor(dict_modulo=dict))
+                self.btn_modulo.clicked.connect(lambda ch, dict=dict_modulo: self.modulo_construtor(dict_modulo=dict))
                 if x % 2 == 0:
-                    self.modulos_layout_modulo_1.addWidget(self.btn)
+                    self.modulos_layout_modulo_1.addWidget(self.btn_modulo)
                 else:
-                    self.modulos_layout_modulo_2.addWidget(self.btn)
+                    self.modulos_layout_modulo_2.addWidget(self.btn_modulo)
         except Exception as e:
             print(e)
 
@@ -128,15 +152,134 @@ class TelaProfessor(QDialog, DadosPessoa):
         except Exception as e:
             print(e)
 
+    def aulas_construtor(self):
+        try:
+            comando_sql = f"SELECT DeAu.id, DeAu.aula " \
+                          f"FROM departamento_aula DeAu " \
+                          f"WHERE DeAu.professor_id={self.usuario_logado['id_professor']}"
+            aulas = self.conexao.select_all(comando_sql=comando_sql)
+            for i in reversed(range(self.aulas_layout_aula_pronta.count())):
+                objeto = self.aulas_layout_aula_pronta.itemAt(i).widget()
+                self.aulas_layout_aula_pronta.removeWidget(objeto)
+                objeto.setParent(None)
+            if not aulas:
+                aulas_label_aulas = QtWidgets.QLabel('Não há aulas cadastradas')
+                self.aulas_layout_aula_pronta.addWidget(aulas_label_aulas)
+            else:
+                for x, aula in enumerate(aulas):
+                    self.btn_aula = QtWidgets.QPushButton(aula[1])
+                    id_aula = aula[0]
+                    self.btn_aula.clicked.connect(lambda cd, id=id_aula: self.aula_construtor(id_aula=id_aula))
+                    self.aulas_layout_aula_pronta.addWidget(self.btn_aula)
+        except Exception as e:
+            print(e)
+
+    def aula_construtor(self, id_aula=None):
+        try:
+            comando_sql = f"SELECT * FROM departamento_aula WHERE id={id_aula}"
+            dados = self.conexao.executa_fetchone(comando_sql=comando_sql)
+            self.menu_stacked.setCurrentWidget(self.aulas_aula)
+            self.aula_label_aula.setText(f"{dados[1]}")
+            self.aula_label_conteudo.setText(f"{dados[2]}")
+
+        except Exception as e:
+            print(e)
+
+    def vincula_aula_modulo_construtor(self):
+        try:
+            self.input_vincula_aula(input=self.vincula_aula_modulo_input_aula)
+            self.input_vincula_modulo(input=self.vincula_aula_modulo_input_modulo)
+        except Exception as e:
+            print(e)
+
+    def criar_aula_construtor(self):
+        self.input_nivel(input=self.criar_aula_input_nivel)
+
+
+    def input_vincula_aula(self, input=None):
+        try:
+            input.clear()
+            comando_sql = f"SELECT DeAu.aula " \
+                          f"FROM departamento_aula DeAu " \
+                          f"WHERE DeAu.professor_id={self.usuario_logado['id_professor']}"
+            aulas = self.conexao.select_all(comando_sql=comando_sql)
+            for aula in aulas:
+                input.addItem(f'{aula[0]}')
+        except Exception as e:
+            print(e)
+
+    def input_vincula_modulo(self, input=None):
+        try:
+            input.clear()
+            comando_sql = f"SELECT DeMo.id, DeMo.modulo, DeMo.nivel_id " \
+                          f"FROM departamento_professor_modulo DePrMo " \
+                          f"INNER JOIN departamento_modulo DeMo " \
+                          f"ON DeMo.id = DePrMo.modulo_id WHERE professor_id = {self.usuario_logado['id_professor']};"
+            modulos = self.conexao.select_all(comando_sql=comando_sql)
+            for modulo in modulos:
+                input.addItem(f'{modulo[1]}')
+        except Exception as e:
+            print(e)
+
     # FIM CONSTRUTORES DE TELA #
 
     # FUNCOES DE TELA #
+    def cad_criar_aula(self):
+        try:
+            # ARQUIVOS
+            video_aula = self.arquivo(input=self.criar_aula_input_video)
+            conteudo_aula = self.arquivo(input=self.criar_aula_input_conteudo_download)
+            #
+            ano = date.today().strftime("%Y")
+            mes = date.today().strftime("%m")
+
+            # VIDEO AULA
+            arquivo_video_aula = {
+                'pasta_especifica': 'aula',
+                'arquivo': video_aula,
+                'ano': ano,
+                'mes': mes,
+            }
+            self.copia_arquivo(
+                dict=arquivo_video_aula,
+                input=self.criar_aula_input_video,
+            )
+
+            # CONTEUDO AULA
+            arquivo_conteudo_aula = {
+                'pasta_especifica': 'conteudo_aula',
+                'arquivo': conteudo_aula,
+                'ano': ano,
+                'mes': mes,
+
+            }
+            self.copia_arquivo(
+                dict=arquivo_conteudo_aula,
+                input=self.criar_aula_input_conteudo_download,
+            )
+            aula = Aula(
+                aula=self.criar_aula_input_titulo_aula.displayText(),
+                conteudo=self.criar_aula_input_conteudo.toPlainText(),
+                aula_gravada=fr"{arquivo_video_aula['pasta_especifica']}\{arquivo_video_aula['ano']}\{arquivo_video_aula['mes']}\{arquivo_video_aula['arquivo']}",
+                professor=self.usuario_logado['id_professor'],
+                conteudo_aula=fr"{arquivo_conteudo_aula['pasta_especifica']}\{arquivo_conteudo_aula['ano']}\{arquivo_conteudo_aula['mes']}\{arquivo_conteudo_aula['arquivo']}",
+                nivel=self.criar_aula_input_nivel.currentText()
+            )
+            aula.cadastrar_aula()
+
+        except Exception as e:
+            print(e)
+
 
     # DISCIPLINAS #
 
     # FIM DISCIPLINAS #
+
+
 ##
 
 
 if __name__ == '__main__':
-    executa_menu_professor()
+    data = date.today().strftime(r"%Y\%m")
+    caminho_destino = fr'C:\Users\pedro\Desktop\Trabalho Final Senai\trabalho_final_web\media\conteudo_aula\{data}'
+    print(caminho_destino)

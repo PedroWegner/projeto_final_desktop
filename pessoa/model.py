@@ -118,6 +118,7 @@ class Pessoa(PessoaUtil, object):
         self.data_cadastro = data_cadastro
         self.endereco = endereco
         self.estado_civil = estado_civil
+
         self.data_cadastro = datetime.now()
         # self.cadastrar_pessoa()
 

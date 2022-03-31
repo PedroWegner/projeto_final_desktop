@@ -1,6 +1,9 @@
+import os
+import shutil
+
 from PyQt5 import QtWidgets, uic
 from departamento.model import Aluno
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QFileDialog
 from departamento.view_base import DadosPessoa
 
 app = QtWidgets.QApplication([])
@@ -30,6 +33,7 @@ class TelaAluno(QDialog, DadosPessoa):
             )
             self.id_aluno()
             self.btn = None
+            self.btn_aula = None
 
             # btn singals  - MENU - #
             # HOME
@@ -46,6 +50,7 @@ class TelaAluno(QDialog, DadosPessoa):
             self.menu_btn_att_dados.clicked.connect(self.att_dados_construtor)
             self.menu_btn_att_dados.clicked.connect(self.limpa_att_dados)
             self.att_dados_btn_att_dados.clicked.connect(self.att_dados)
+            self.att_dados_btn_att_dados.clicked.connect(self.limpa_att_dados)
 
             # ATUALIZAR SENHA
             self.menu_btn_att_senha.clicked.connect(lambda: self.menu_stacked.setCurrentWidget(self.menu_att_senha))
@@ -118,6 +123,59 @@ class TelaAluno(QDialog, DadosPessoa):
     def modulo_construtor(self, dict_modulo=None):
         self.menu_stacked.setCurrentWidget(self.modulos_modulo)
         self.modulo_label_modulo.setText(f"{dict_modulo['modulo']}")
+
+        for i in reversed(range(self.modulo_layout_aula.count())):
+            aula_removida = self.modulo_layout_aula.itemAt(i).widget()
+            self.modulo_layout_aula.removeWidget(aula_removida)
+            aula_removida.setParent(None)
+
+        comando_sql = f"SELECT DeAu.* " \
+                      f"FROM departamento_aula_modulo DeAuMo " \
+                      f"INNER JOIN departamento_aula DeAu " \
+                      f"ON DeAuMo.aula_id = DeAu.id " \
+                      f"WHERE DeAuMo.modulo_id ={dict_modulo['id_modulo']}"
+        aulas = self.conexao.select_all(comando_sql=comando_sql)
+        for x, aula in enumerate(aulas):
+            dict_aula = {
+                'id_aula': aula[0],
+                'aula': aula[1],
+                'conteudo': aula[2],
+                'data_post': aula[3],
+                'aula_gravada': aula[4],
+                'professor': aula[5],
+                'conteudo_download': aula[6],
+                'nivel': aula[7],
+            }
+            self.btn_aula = QtWidgets.QPushButton(dict_aula['aula'])
+            self.btn_aula.clicked.connect(lambda cd, dict=dict_aula: self.aula_construtor(dict_aula=dict_aula))
+            self.modulo_layout_aula.addWidget(self.btn_aula)
+
+            ##
+
+
+    def aula_construtor(self, dict_aula=None):
+        self.menu_stacked.setCurrentWidget(self.modulo_aula)
+        self.aula_label_aula.setText(f"{dict_aula['aula']}")
+        self.aula_label_conteudo.setText(f"{dict_aula['conteudo']}")
+        self.aula_btn_download_conteudo.clicked.connect(lambda: self.salva_arquivo(arquivo_download=dict_aula['conteudo_download']))
+
+    def salva_arquivo(self, arquivo_download=None):
+        try:
+            diretorio_arquivo = fr'C:\Users\pedro\Desktop\Trabalho Final Senai\trabalho_final_web\media\{arquivo_download}'
+            diretorio_download, extensao = QFileDialog.getSaveFileName(
+                parent=self.menu_stacked,
+                caption='Salvar arquivo',
+                directory=r'C:\Users\pedro\Desktop',
+                initialFilter="Text files (*.txt)",
+                filter=".txt",
+            )
+            diretorio_download = diretorio_download + extensao
+            shutil.copy(diretorio_arquivo, diretorio_download)
+        except Exception as e:
+            print(e)
+
+        # shutil.copy()
+
     # FIM CONSTRUTORES DE TELA #
 
     # FUNCOES DE TELA #
